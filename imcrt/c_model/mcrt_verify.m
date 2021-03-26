@@ -1,5 +1,5 @@
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-clean
+clean %(alias for clc;clear all;close all)
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % a stripped down version to verify accuracy by comparison with van de
@@ -10,13 +10,13 @@ clean
 % in Biomedicine, 47(2), 131?146, https://doi.org/10.1016/0169
 % 2607(95)01640 F, 1995.
 
-test_refl       = false;
-test_ang        = false;
-test_fluence    = true;
+test_refl       = false; % verify total reflectance
+test_ang        = false; % verify angular reflectance
+test_fluence    = true;  % verify fluence
 save_figs       = false;
 
-opts.path.data  = setpath('myProjects/mcrt3d/v8/b_input/');
-opts.path.save  = setpath('myProjects/mcrt3d/v8/d_output/wang/');
+opts.path.data  = 'path/to/b_input/';
+opts.path.save  = 'path/to/d_output/wang/';
 opts.save_data  = false;
 
 % load the predefined geometry
@@ -28,7 +28,7 @@ load([opts.path.data 'mcrt_geometry_input']);
 
 % PHOTON SETTINGS
 %~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-% N       = 5e5;              % number of photons
+% N       = 5e5;              % number of photons (set below)
 wmin    = 1e-4;             % min photon weight before discarding it
 wrr     = 10;               % 1/wrr photons are reinjected (russian roulette)
 
@@ -81,23 +81,18 @@ hg4     = 1+g;              % 1-g for BMC
 hg5     = -2*g;             % 2*g for BMC
 two_pi  = 2*pi;             
 
-% not sure if this is needed
-opts    = mcrt_set_case(opts,1);
+% this shouldn't be needed
+% opts    = mcrt_set_case(opts,1);
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %% initialize output grids with +1 for overflow
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Adf_rz  = zeros(nz+1,nr+1);     % absorption diffuse
-Adr_z   = zeros(nz+1,1);        % absorption direct
-Tdf_ra  = zeros(na,nr+1);       % transmittance diffuse
-Rdf_ra  = zeros(na,nr+1);       % reflectance diffuse 
-Tdr     = 0;                    % transmittance direct (unscattered)
-Rdr     = 0;                    % reflectance direct (unscattered)
-
-% put the detector inside the medium for BMC
-% dz          = -dz;              % so iz evaluates positive
-% zd          = -Z;               % detector position (for photon release)
-% cgeom(3)    = cgeom(3)-Z;       % cylinder base
+Adf_rz  = zeros(nz+1,nr+1);     % absorption, diffuse
+Adr_z   = zeros(nz+1,1);        % absorption, direct
+Tdf_ra  = zeros(na,nr+1);       % transmittance, diffuse
+Rdf_ra  = zeros(na,nr+1);       % reflectance, diffuse 
+Tdr     = 0;                    % transmittance, direct (unscattered)
+Rdr     = 0;                    % reflectance, direct (unscattered)
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %% monte carlo
@@ -126,10 +121,6 @@ for n=1:N
         iz = ceil(z/dz);                            % vertical index
         if ir>nr; ir = nr+1; end                    % radial overflow 
         if iz>nz; iz = nz+1; end                    % vertical overflow
-
-% test partial reflection/transmittance
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
-%         awt = a*wt;
 
 % score transmittance / reflectance
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        
@@ -227,10 +218,10 @@ phi_z       = (Adf_z+Adr_z)./ka;        % Eq. 4.29
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %% validate by comparison with van de hulst, Vol. 2, pg. 435, Table 35 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Rdvdh       = 0.09739;                  % diffuse flux
-Tdvdh       = 0.66096;                  % diffuse flux
+Rdvdh       = 0.09739;                  % diffuse reflectance
+Tdvdh       = 0.66096;                  % diffuse transmittance
 Tdrs        = exp(-(ka+ks)*Z);          % direct transmittance
-Rd_e        = Rdf-Rdvdh;                 % error
+Rd_e        = Rdf-Rdvdh;                % error
 Td_e        = Tt-Tdvdh;
 Tdr_e       = Tdr-Tdrs;
 
@@ -249,12 +240,10 @@ if test_refl == true || test_ang == true
     Tdf_a(1)    = Tdf_a(1)+Tdr; % total transmittance includes the direct
 
     
-    fprintf(' Rd\n MCML: %.5f\n van de Hulst: %.5f\n error: %.5f\n',Rdf,Rdvdh,Rd_e)
-    fprintf(' \n Td\n MCML: %.5f\n van de Hulst: %.5f\n error: %.5f\n',Tt,Tdvdh,Td_e)
-    fprintf(' \n Tdr\n MCML: %.5f\n theory: %.5f\n error: %.5f\n',Tdr,Tdrs,Tdr_e)
+    fprintf(' Rd\n iMCRT: %.5f\n van de Hulst: %.5f\n error: %.5f\n',Rdf,Rdvdh,Rd_e)
+    fprintf(' \n Td\n iMCRT: %.5f\n van de Hulst: %.5f\n error: %.5f\n',Tt,Tdvdh,Td_e)
+    fprintf(' \n Tdr\n iMCRT: %.5f\n theory: %.5f\n error: %.5f\n',Tdr,Tdrs,Tdr_e)
 
-%     figure('Units','in','Position',[3 3 5 8]); 
-%     tiledlayout(2,1,'TileSpacing','compact','Padding','compact'); nexttile
     figure('Units','in','Position',[3 3 12 5]); 
     tiledlayout(1,2,'TileSpacing','compact','Padding','compact'); nexttile
     scatter(ai./pi,Rdf_a,80,'filled','s'); hold on; box on
