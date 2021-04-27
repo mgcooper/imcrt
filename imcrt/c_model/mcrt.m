@@ -1,13 +1,13 @@
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-clean               % v11 - fixed scaled omega error and final IEQs
+clean               % v11
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-opts.path.root      = 'GREENLAND/field/2018/a_submitted/monte_carlo/';
-opts.path.data      = [opts.path.root '20july/b_input/'];
-opts.path.save      = [opts.path.root '20july/d_output/'];
-opts.path           = setpath(opts.path);
+opts.path.root      = 'path/to/imcrt/';
+opts.path.data      = [opts.path.root 'b_input/20july/'];
+opts.path.save      = [opts.path.root 'd_output/20july/'];
+% opts.path           = setpath(opts.path); custom function that appends full path
 opts.save_data      = true;
 opts.use_ssa        = false;    % use specific surface area or mie theory?
-opts.use_dE         = true;
+opts.use_dE         = true;     
 opts.transmittance  = true;
 opts.reflectance    = false;
 opts.fluence        = false;
