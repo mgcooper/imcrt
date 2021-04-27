@@ -2,21 +2,24 @@
 clean
 %==========================================================================
 
+% this is an older implementation that saved the output but this is no
+% longer used, but is kept here as reference
+
 save_data   = true;
 july20      = false;
 july21      = true;
 
-p.data      = 'GREENLAND/field/2018/a_submitted/monte_carlo/';
-p.save      = 'GREENLAND/field/2018/a_submitted/monte_carlo/';
+p.data      = 'path/to/b_input/';
+p.save      = 'path/to/b_input/';
 %==========================================================================
 %% set paths
 %==========================================================================
 if july20 == true
-    p.data  = [p.data '20july/b_input/'];
-    p.save  = [p.save '20july/b_input/'];
+    p.data  = [p.data '20july/'];
+    p.save  = [p.save '20july/'];
 elseif july21 == true
-    p.data  = [p.data '21july/b_input/'];
-    p.save  = [p.save '21july/b_input/'];
+    p.data  = [p.data '21july/'];
+    p.save  = [p.save '21july/'];
 end
 p           = setpath(p);
 %==========================================================================
