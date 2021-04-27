@@ -1,30 +1,30 @@
 clean
 %==========================================================================
 
-save_data   = true;
-july20      = true;
+save_data   = false;    % the data has been saved already
+july20      = true;     
 july21      = false;
 wavl        = [350;400;450;500;550;600;650;700;750];
 
 %==========================================================================
 %% set paths
 %==========================================================================
-p.data      = 'GREENLAND/field/2018/a_submitted/monte_carlo/';
-p.save      = 'GREENLAND/field/2018/a_submitted/monte_carlo/';
+p.data      = 'path/to/a_preprocess/data/';
+p.save      = 'path/to/b_input/';
 
 if july20 == true
-    p.data  = [p.data '20july/a_preprocess/data/'];
-    p.save  = [p.save '20july/b_input/'];
+    p.save  = [p.save '20july/'];
 elseif july21 == true
-    p.data  = [p.data '21july/a_preprocess/data/'];
-    p.save  = [p.save '21july/b_input/'];
+    p.save  = [p.save '21july/'];
 end
-p = setpath(p);
 
 %==========================================================================
 %% optical properties - mie
 %==========================================================================
-load([p.data 'mie_iops_dE.mat']);
+% _dE means use inherent optical properties inferred from the optical 
+% measurements based on an inversion of the delta-Eddington asymptotic
+% solution rather than Eddington. The dE values are used in the paper.
+load([p.data 'mie_iops_dE.mat']); 
 load([p.data 'rod_refl.mat']);
 
 iwavl           = find(ismember(iops.kice.wavl,wavl));  % wavelength (nm)
