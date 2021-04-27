@@ -5,22 +5,26 @@ save_data   = true;
 july20      = false;
 july21      = true;
 
-% need to remove the redundant dates folders 
+% note: I need to create folders for 20july and 21july in p.data and upload
+% the ice density and inherent optical properties data structures, and then
+% uncomment the lines below that set p.data to point there. For now, if 
+% anyone uses this code, the data in a_preprocess/data/ are for one of those
+% two days, but only the iops data will differ, since those are inferred
+% from the optical measurements.
 
-p.data      = 'GREENLAND/field/2018/a_submitted/monte_carlo/';
-p.save      = 'GREENLAND/field/2018/a_submitted/monte_carlo/';
+p.data      = 'path/to/a_preprocess/data/';
+p.save      = 'path/to/b_input/';
 %==========================================================================
 %% set paths
 %==========================================================================
 if july20 == true
-    p.data  = [p.data '20july/a_preprocess/data/'];
-    p.save  = [p.save '20july/b_input/'];
-    p       = setpath(p);
+%     p.data  = [p.data '20july/'];
+    p.save  = [p.save '20july/'];
     load([p.data 'IEQ_with_screw']);
     Zd      = 100.*cumsum(IEQ.dIEQ_k20_constant);
 elseif july21 == true
-    p.data  = [p.data '21july/a_preprocess/data/'];
-    p.save  = [p.save '21july/b_input/'];
+%     p.data  = [p.data '21july/'];
+    p.save  = [p.save '21july/'];
     load([p.data 'IEQ_with_screw']);
     p       = setpath(p);
     Zd      = 100.*cumsum(IEQ.dIEQ_k21_constant);
