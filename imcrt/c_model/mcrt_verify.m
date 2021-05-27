@@ -1,5 +1,5 @@
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-clean %(alias for clc;clear all;close all)
+clean
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % a stripped down version to verify accuracy by comparison with van de
@@ -10,13 +10,13 @@ clean %(alias for clc;clear all;close all)
 % in Biomedicine, 47(2), 131?146, https://doi.org/10.1016/0169
 % 2607(95)01640 F, 1995.
 
-test_refl       = false; % verify total reflectance
-test_ang        = false; % verify angular reflectance
-test_fluence    = true;  % verify fluence
+test_refl       = true;  % verify total reflectance
+test_ang        = true;  % verify angular reflectance
+test_fluence    = false; % verify fluence (slower)
 save_figs       = false;
 
-opts.path.data  = 'path/to/b_input/';
-opts.path.save  = 'path/to/d_output/wang/';
+opts.path.data  = '/full/path/to/b_input/';
+opts.path.save  = '/full/path/to/d_output/verify/';
 opts.save_data  = false;
 
 % load the predefined geometry
@@ -26,9 +26,13 @@ load([opts.path.data 'mcrt_geometry_input']);
 %% experimental setup
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+% commented values are set conditionally, but would be activated for a new
+% custom setup for your own problem, in which case you would remove the 
+% conditional blocks for test_refl, test_ang, and test_fluence
+
 % PHOTON SETTINGS
 %~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-% N       = 5e5;              % number of photons (set below)
+% N       = 5e5;            % number of photons (set below based on the test)
 wmin    = 1e-4;             % min photon weight before discarding it
 wrr     = 10;               % 1/wrr photons are reinjected (russian roulette)
 
@@ -55,9 +59,9 @@ end
 
 % GRID SETTINGS
 %~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-% Z       = 1;              % thickness of medium (12,36,58,77)     [cm]
+% Z       = 1;              % thickness of medium                   [cm]
 % dz      = 0.005;          % vertical bin width                    [cm]
-R       = 2;                % cylindrical radius of detection       [cm]
+R       = 2;                % cylindrical detection radius          [cm]
 A       = pi/2;             % angular detection radius              [rad]
 dr      = 0.001;            % radial bin width                      [cm]
 da      = A/30;             % angular bin width                     [rad]
@@ -77,12 +81,9 @@ c       = 1/(ka+ks);        % extinction path length            [cm]
 hg1     = 1/(2*g);          % h-g scattering terms
 hg2     = (1+g^2);
 hg3     = (1-g^2);
-hg4     = 1+g;              % 1-g for BMC
-hg5     = -2*g;             % 2*g for BMC
+hg4     = 1+g;
+hg5     = -2*g;
 two_pi  = 2*pi;             
-
-% this shouldn't be needed
-% opts    = mcrt_set_case(opts,1);
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %% initialize output grids with +1 for overflow
@@ -100,7 +101,6 @@ Rdr     = 0;                    % reflectance, direct (unscattered)
 for n=1:N
     wt  = 1;                % new photon, weight = 1
     ns  = 0;                % number of scattering events
-    nd  = 0;                % number of rod events    
     x   = 0;                % generated at position (0,0,0):
     y   = 0;               
     z   = 0;
@@ -262,7 +262,7 @@ if test_refl == true || test_ang == true
     set(gca,'TickDir','in','XMinorTick','on','YMinorTick','on')
     
     if save_figs == true
-        export_fig([opts.path.save 'mcrt_ang_validate.png'],'-r400');
+        exportgraphics([opts.path.save 'mcrt_ang_validate.png']);
     end
     
 elseif test_fluence == true
