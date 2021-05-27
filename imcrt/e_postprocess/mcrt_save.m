@@ -1,23 +1,25 @@
 clean
 
+% this is how i saved the output
+
 save_data   = true;
 fdate       = '20july';
 iops        = 'mie_dE';
 between     = false;
 wavl        = [350;400;450;500;550;600;650;700;750];
 
-p.root      = 'GREENLAND/field/2018/a_submitted/monte_carlo/';
+p.root      = '/full/path/to/imcrt/';
 
 if strcmp(fdate,'20july') == true
-    p.save  = [p.root '20july/f_data/' iops '/'];
-    p.root  = [p.root '20july/d_output/' iops '/'];
+    p.save  = [p.root 'f_data/20july/' iops '/'];
+    p.root  = [p.root 'd_output/20july/' iops '/'];
     Z       = [12;33;53;70];
 elseif strcmp(fdate,'21july') == true
     Z       = [50;63;77;116];
-    p.save  = [p.root '21july/f_data/' iops '/'];
-    p.root  = [p.root '21july/d_output/' iops '/'];
+    p.save  = [p.root 'f_data/21july/' iops '/'];
+    p.root  = [p.root 'd_output/21july/' iops '/'];
 end
-p        = setpath(p);
+
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %% read / save the data
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
