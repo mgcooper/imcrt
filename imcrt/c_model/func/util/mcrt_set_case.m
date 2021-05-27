@@ -1,5 +1,11 @@
 function opts = mcrt_set_case(opts,case_flag)
 
+% 'kice' is pure ice absorptivity from Warren et al. 2006
+% 'kabs' is the in-situ ice absorptivity from Cooper et al. 2021
+% the options below setup eight experiments that test the two
+% k options, with and without detector rod interference, and 
+% with and without the empirical angular response of the rcr.
+% see Cooper et al. 2021 for a full description.
 
 switch case_flag
     case 1                              % no rod, no rcr, kice (ideal case)
