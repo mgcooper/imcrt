@@ -1,10 +1,9 @@
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 clean               % v11
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-opts.path.root      = 'path/to/imcrt/';
+opts.path.root      = '/full/path/to/imcrt/';
 opts.path.data      = [opts.path.root 'b_input/20july/'];
 opts.path.save      = [opts.path.root 'd_output/20july/'];
-% opts.path           = setpath(opts.path); custom function that appends full path
 opts.save_data      = true;
 opts.use_ssa        = false;    % use specific surface area or mie theory?
 opts.use_dE         = true;     
@@ -57,8 +56,7 @@ for ii = 1:8                % Loop through each experiment
     [mux,muy,muz,~]             = mcrt_init_photons(opts,iops);
     disp([num2str(geom.Z) 'cm set ' int2str(ii)]);
 
-% for j = 1:length(wavl)      % monte carlo
-for j = 1:1
+for j = 1:length(wavl)      % monte carlo
     disp([num2str(wavl(j)) 'nm']);
     
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
@@ -109,7 +107,7 @@ for j = 1:1
         tfs = false;            % was prior event a scatter off the rod?
         tfd = false;            % assume the photon is not inside the rod
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% keep going until max scatter, min intensity, or z>0 is satisfied
+% keep going until wt<wmin (abs), z>Z (refl), or z<0 (trans) is satisfied
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         while wt > opts.wmin
             l = -c*log(1-rand);         % path length
