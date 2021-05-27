@@ -40,11 +40,11 @@ function [ri,ai,zi,dr,da,dz]  = mcrt_build_grid(geom)
     ai      = ai + cot(ai).*(1-da/2*cot(da/2));       % Eq. 14    
 % the optimal z-coordinate is the center of each element i.e. zi
 
-% transpose ai and zi to columns
-    ai      = ai';
-    zi      = zi';
+% make ai and zi columns
+    ai      = ai(:);
+    zi      = zi(:);
 
-% % get new da/dr/dz
+% get new da/dr/dz ('derivative' can be downloaded on the file exchange)
     da      = derivative(ai);
     dr      = derivative(ri);
     dz      = derivative(zi);
