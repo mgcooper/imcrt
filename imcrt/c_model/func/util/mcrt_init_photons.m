@@ -26,7 +26,7 @@ else
         if length(rcr)~=N
             newfreq = length(rcr)/N;
             newang = newfreq:newfreq:length(rcr);
-            rcr = interp1(1:length(rcr),rcr,newang); rcr = rcr';
+            rcr = interp1(1:length(rcr),rcr,newang); rcr = rcr(:);
         end
         muz = rcr;
         muy = sqrt(1.0-muz.^2).*sin(phis);
