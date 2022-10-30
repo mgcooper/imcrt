@@ -17,9 +17,8 @@ opts.save_data  = false;
 load([opts.path.data 'mcrt_geometry_input']);
 opts.geom = geom;
 	
-%--------------------------------------------------------------------------
+
 %% experimental setup
-%--------------------------------------------------------------------------
 
 % commented values are set conditionally, but would be activated for a new
 % custom setup for your own problem, in which case you would remove the 
@@ -78,17 +77,16 @@ opts.c       = 1/(ka+ks);        % extinction path length            [cm]
 
 % CALL THE FUNCTION
 %~~~~~~~~~~~~~~~~~~~~~~~~~~ 	
-mcrt_out = mcrt(mcrt_opts)	
-	
+mcrt_out = mcrt(mcrt_opts);
 
 % this would go in b_mcrt_geom, after the detector rod is built, but only
 % because the 'shp' object is not saved in 'rod', otherwise it could go
 % here / at the end of mcrt, the user would pause the model when tfs = true
 % and this could be used to plot the prior point, current point, and verify
 % the solution agains linexlines2D
-%==========================================================================
+
+
 %% Example of plotting the photon position during the simulation
-%==========================================================================
 
 % % if, during the simulation, you want to pause and plot the photon:
 % 
