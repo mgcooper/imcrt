@@ -1,4 +1,6 @@
-clean
+clearvars
+close all
+clc
 
 % set options
 test_refl      = true;     % verify total reflectance or not
@@ -8,7 +10,7 @@ test_fluence   = false;    % verify fluence (slower) or not
 % Sect. 5.1 Total diffuse reflectance and total transmittance
 % Sect. 5.2 Angularly resolved diffuse reflectance and transmittance
 if test_refl == true || test_ang == true
-    N   = 5e6;       % number of photon packets
+    N   = 1e2;       % number of photon packets
     Z   = 0.02;      % total thickness of medium
     g   = 0.75;      % asymmetry parameter
     ka  = 10;        % absorption coefficient (m-1)
@@ -29,7 +31,7 @@ end
 %--------------------------------------------------------------------------
 % Run the model
 %--------------------------------------------------------------------------
-RT = mcrt_test(ka,ks,g,Z,dz,N);
+  RT  =  mcrt(ka,ks,g,Z,dz,N);
 %--------------------------------------------------------------------------
 %--------------------------------------------------------------------------
 
@@ -59,11 +61,11 @@ uvdh  = acos(fliplr(uvdh))./pi;
 
 %% plot the results
 if test_refl == true || test_ang == true
-    
+
     % for comparison with vdh, add back the direct R/T
     Rdf_a(1)    = Rdf_a(1)+Rdr; % total transmittance includes the direct
     Tdf_a(1)    = Tdf_a(1)+Tdr; % total transmittance includes the direct
-    
+
     fprintf(' Rd\n iMCRT: %.5f\n van de Hulst: %.5f\n error: %.5f\n',Rdf,Rd_vdh,Rd_err)
     fprintf(' \n Td\n iMCRT: %.5f\n van de Hulst: %.5f\n error: %.5f\n',Tt,Td_vdh,Td_err)
     fprintf(' \n Tdr\n iMCRT: %.5f\n theory: %.5f\n error: %.5f\n',Tdr,Tdrs,Tdr_err)
@@ -71,22 +73,22 @@ if test_refl == true || test_ang == true
     figure('Units','in','Position',[3 3 12 5]);
     tiledlayout(1,2,'TileSpacing','compact','Padding','compact'); nexttile
     scatter(RT.grid.ai./pi,Rdf_a,80,'filled','s'); hold on; box on
-    scatter(uvdh,Rvdh,80,'filled'); 
+    scatter(uvdh,Rvdh,80,'filled');
     xlabel('exiting angle, \alpha [\pi rad]','Interpreter','tex');
     ylabel('R_d(\alpha) [sr^{-1}]','Interpreter','tex');
     legend('iMCRT','van de Hulst');
     set(gca,'TickDir','in','XMinorTick','on','YMinorTick','on')
-    
+
     nexttile
     scatter(RT.grid.ai./pi,Tdf_a,80,'filled','s'); hold on; box on
-    scatter(uvdh,Tvdh,80,'filled'); 
+    scatter(uvdh,Tvdh,80,'filled');
     xlabel('exiting angle, \alpha [\pi rad]','Interpreter','tex');
     ylabel('T_d(\alpha) [sr^{-1}]','Interpreter','tex');
     legend('iMCRT','van de Hulst');
     set(gca,'TickDir','in','XMinorTick','on','YMinorTick','on')
-    
+
 elseif test_fluence == true
-    
+
     % see Fig. 4 in Wang et al. 1995 for comparison
     figure;
     scatter(RT.grid.zi,RT.phi_z);
@@ -97,6 +99,6 @@ end
 
 % see Vol. 1, pg. 262, Table 12 for isotropic
 
-% figure; plot(Adf_z); hold on; plot(Adr_z) 
+% figure; plot(Adf_z); hold on; plot(Adr_z)
 % figure; plot(zi,sum(phi_rz,2)); set(gca,'YScale','log')
 % figure; plot(zi,phi_z); set(gca,'YScale','log')
