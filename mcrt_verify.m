@@ -10,7 +10,7 @@ test_fluence   = false;    % verify fluence (slower) or not
 % Sect. 5.1 Total diffuse reflectance and total transmittance
 % Sect. 5.2 Angularly resolved diffuse reflectance and transmittance
 if test_refl == true || test_ang == true
-    N   = 1e2;       % number of photon packets
+    N   = 1e6;       % number of photon packets
     Z   = 0.02;      % total thickness of medium
     g   = 0.75;      % asymmetry parameter
     ka  = 10;        % absorption coefficient (m-1)
@@ -71,21 +71,23 @@ if test_refl == true || test_ang == true
     fprintf(' \n Tdr\n iMCRT: %.5f\n theory: %.5f\n error: %.5f\n',Tdr,Tdrs,Tdr_err)
 
     figure('Units','in','Position',[3 3 12 5]);
-    tiledlayout(1,2,'TileSpacing','compact','Padding','compact'); nexttile
+    %tiledlayout(1,2,'TileSpacing','compact','Padding','compact'); nexttile
+    subplot(1,2,1);
     scatter(RT.grid.ai./pi,Rdf_a,80,'filled','s'); hold on; box on
     scatter(uvdh,Rvdh,80,'filled');
     xlabel('exiting angle, \alpha [\pi rad]','Interpreter','tex');
     ylabel('R_d(\alpha) [sr^{-1}]','Interpreter','tex');
     legend('iMCRT','van de Hulst');
-    set(gca,'TickDir','in','XMinorTick','on','YMinorTick','on')
+    %set(gca,'TickDir','in','XMinorTick','on','YMinorTick','on')
 
-    nexttile
+    %nexttile
+    subplot(1,2,2);
     scatter(RT.grid.ai./pi,Tdf_a,80,'filled','s'); hold on; box on
     scatter(uvdh,Tvdh,80,'filled');
     xlabel('exiting angle, \alpha [\pi rad]','Interpreter','tex');
     ylabel('T_d(\alpha) [sr^{-1}]','Interpreter','tex');
     legend('iMCRT','van de Hulst');
-    set(gca,'TickDir','in','XMinorTick','on','YMinorTick','on')
+    %set(gca,'TickDir','in','XMinorTick','on','YMinorTick','on')
 
 elseif test_fluence == true
 
