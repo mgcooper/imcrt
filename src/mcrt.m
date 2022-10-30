@@ -1,4 +1,4 @@
-function RT = mcrt_test(ka,ks,g,Z,dz,N)
+function RT = mcrt(ka,ks,g,Z,dz,N)
 
 % optical coefficients
 w       = ks/(ka+ks);       % single-scattering albedo          [-]
@@ -23,15 +23,15 @@ A       = pi/2;             % angular detection radius              [rad]
 dr      = 0.001;            % radial bin width                      [cm]
 da      = A/30;             % angular bin width                     [rad]
 du      = da/(pi/2);        % angular bin width in cos(theta) coordinates
-nr      = round(R/dr,0);    % radial
-na      = round(A/da,0);    % angular
-nz      = round(Z/dz,0);    % vertical
+nr      = round(R/dr);    % radial
+na      = round(A/da);    % angular
+nz      = round(Z/dz);    % vertical
 
 % initialize output grids with +1 for overflow
 Adf_rz  = zeros(nz+1,nr+1);     % absorption, diffuse
 Adr_z   = zeros(nz+1,1);        % absorption, direct
 Tdf_ra  = zeros(na,nr+1);       % transmittance, diffuse
-Rdf_ra  = zeros(na,nr+1);       % reflectance, diffuse 
+Rdf_ra  = zeros(na,nr+1);       % reflectance, diffuse
 Tdr     = 0;                    % transmittance, direct (unscattered)
 Rdr     = 0;                    % reflectance, direct (unscattered)
 
@@ -39,13 +39,13 @@ Rdr     = 0;                    % reflectance, direct (unscattered)
 for n=1:N
     wt  = 1;                % new photon, weight = 1
     x   = 0;                % generated at position (0,0,0):
-    y   = 0;               
+    y   = 0;
     z   = 0;
     ux  = 0;                % with trajectory 0,0,1 (mu_x, mu_y, mu_z)
     uy  = 0;
     uz  = 1;                % = 1 for vertical, = 1-2*rand for isotropic
     ns  = 0;                % number of scattering events
-    
+
 % keep going until min intensity or z>0 is satisfied
     while wt > wmin
         l = -c*log(rand);                           % path length
@@ -56,7 +56,7 @@ for n=1:N
 % grid indices
         ir = ceil(sqrt(x*x+y*y)/dr);                % radial index
         iz = ceil(z/dz);                            % vertical index
-        if ir>nr; ir = nr+1; end                    % radial overflow 
+        if ir>nr; ir = nr+1; end                    % radial overflow
         if iz>nz; iz = nz+1; end                    % vertical overflow
 
 % score transmittance / reflectance
@@ -64,7 +64,7 @@ for n=1:N
             iu = ceil(acos(uz)/da);                 % angular index
             if ns==0 || uz < du/2
                 Tdr = Tdr+wt;                       % direct
-            else 
+            else
                 Tdf_ra(iu,ir) = Tdf_ra(iu,ir)+wt;   % diffuse
             end
             break                                   % photon escapes
@@ -76,7 +76,7 @@ for n=1:N
                 Rdr = Rdr+wt;                       % direct
             else
                 Rdf_ra(iu,ir) = Rdf_ra(iu,ir)+wt;   % diffuse
-            end   
+            end
             break                                   % photon escapes
         end
 
@@ -115,7 +115,7 @@ for n=1:N
 end
 
 % build a grid to calculate observable quantities (eq. 4.1/4.2 Wang)
-[ri,ai,zi,dr,da,dz] = mcrt_build_grid(R,A,Z,dr,da,dz);
+[ri,ai,zi,dr,da,dz] = buildgrid(R,A,Z,dr,da,dz);
 
 dsr         = 2*pi.*sin(ai).*da;                    % steradians
 dA          = 2*pi.*ri.*dr;                         % radians
@@ -152,7 +152,7 @@ Adf_z       = Adf_z./dz./N;                         % Eq. 4.25
 Adf         = Adf./N;                               % Eq. 4.27
 % phi_rz    = Adf_rz./ka;                           % Eq. 4.28
 % phi_z     = Adf_z./ka;                            % Eq. 4.29
-    
+
 phi_rz      = (Adf_rz+Adr_z)./ka;                   % Eq. 4.28
 phi_z       = (Adf_z+Adr_z)./ka;                    % Eq. 4.29
 
