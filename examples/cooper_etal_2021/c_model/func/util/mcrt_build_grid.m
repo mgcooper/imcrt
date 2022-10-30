@@ -1,5 +1,7 @@
 
-function [ri,ai,zi,dr,da,dz]  = mcrt_build_grid(geom)
+% function [ri,ai,zi,dr,da,dz]  = mcrt_build_grid(geom)
+function [ri,ai,zi,dr,da,dz]  = mcrt_build_grid(R,A,Z,dr,da,dz)
+    
 %MCRT_BUILD_GRID build grids for scoring observable quantities
 
 % note that U/du are in radians here i.e. theta, but for scoring within the
@@ -19,12 +21,12 @@ function [ri,ai,zi,dr,da,dz]  = mcrt_build_grid(geom)
 
 % extract geometric values from the geom struct
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    R       = geom.R;
-    A       = geom.A;
-    Z       = geom.Z;
-    dr      = geom.dr;
-    da      = geom.da;
-    dz      = geom.dz;
+%     R       = geom.R;
+%     A       = geom.A;
+%     Z       = geom.Z;
+%     dr      = geom.dr;
+%     da      = geom.da;
+%     dz      = geom.dz;
     
 % grid center coordinates
     ri      = dr/2:dr:R-dr/2;
