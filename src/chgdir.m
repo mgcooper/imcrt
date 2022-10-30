@@ -27,20 +27,15 @@ else
     uz     = -sintheta_s*sintheta*cosphi_s + uz*us;
 end
 
-% mgc consistency checks, these should = 0
+% should = 0
 % uscheck = us - dot([uxx,uyy,uzz],[ux,uy,uz]); 1 - norm([ux,uy,uz]);
-
-% mgc NOTE: input varnames must be different than output i.e. assignment in
-% place is not supported. I am not sure why, but I think it relates to the
-% trigonometric functions. Assignment in place works fine with the original
-% Leathers/Downes version. 
-% mgc updated notation to ux/uy/uz/us in place of alpha/beta/gamma/gammas
-% mgc replaced matrix multiplication with explicit (faster) expressions for
-% the updated ux, uy, uz and predefined cosphi_s/sinphi_s
-% rewritten code is ~0.1 ms faster than Leathers/Downes version
 
 % mu_x = x-direction cosine
 % mu_y = y-direction cosine
 % mu_z = z-direction cosine
 % mu_s = cosine of polar scattering angle (=cos(Psi)) (or cos(theta))
 % phi_s = azimuthal scattering angle (note, the angle (phi), not cos(phi))
+
+% updated notation to ux/uy/uz/us in place of alpha/beta/gamma/gammas
+% replaced matrix multiplication with explicit (faster) expressions for
+% the updated ux, uy, uz and predefined cosphi_s/sinphi_s
