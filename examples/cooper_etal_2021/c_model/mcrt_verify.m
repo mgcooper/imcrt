@@ -1,6 +1,3 @@
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-clean
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % a stripped down version to verify accuracy by comparison with van de
 % Hulst values and values reported in Wang et al. 1995:
@@ -22,9 +19,8 @@ opts.save_data  = false;
 % load the predefined geometry
 load([opts.path.data 'mcrt_geometry_input']);
 
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 %% experimental setup
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 % commented values are set conditionally, but would be activated for a new
 % custom setup for your own problem, in which case you would remove the 
@@ -85,9 +81,7 @@ hg4     = 1+g;
 hg5     = -2*g;
 two_pi  = 2*pi;             
 
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %% initialize output grids with +1 for overflow
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Adf_rz  = zeros(nz+1,nr+1);     % absorption, diffuse
 Adr_z   = zeros(nz+1,1);        % absorption, direct
 Tdf_ra  = zeros(na,nr+1);       % transmittance, diffuse
@@ -95,9 +89,8 @@ Rdf_ra  = zeros(na,nr+1);       % reflectance, diffuse
 Tdr     = 0;                    % transmittance, direct (unscattered)
 Rdr     = 0;                    % reflectance, direct (unscattered)
 
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %% monte carlo
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 for n=1:N
     wt  = 1;                % new photon, weight = 1
     ns  = 0;                % number of scattering events
@@ -168,9 +161,7 @@ for n=1:N
     end
 end
 
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %% scale R, T, and A
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % build a grid to calculate observable quantities (eq. 4.1/4.2 Wang)
 [ri,ai,zi,dr,da,dz] = mcrt_build_grid(R,A,Z,dr,da,dz);
 dsr         = 2*pi.*sin(ai).*da;
@@ -215,9 +206,9 @@ phi_z       = (Adf_z+Adr_z)./ka;        % Eq. 4.29
 % 
 % figure; plot(zi,sum(phi_rz,2)); set(gca,'YScale','log')
 % figure; plot(zi,phi_z); set(gca,'YScale','log')
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 %% validate by comparison with van de hulst, Vol. 2, pg. 435, Table 35 
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Rdvdh       = 0.09739;                  % diffuse reflectance
 Tdvdh       = 0.66096;                  % diffuse transmittance
 Tdrs        = exp(-(ka+ks)*Z);          % direct transmittance

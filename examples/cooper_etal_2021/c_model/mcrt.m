@@ -11,9 +11,7 @@ opts.transmittance  = true;
 opts.reflectance    = false;
 opts.fluence        = false;
 
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %% load preprocessed data
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 load([opts.path.data 'mcrt_optical_input']);
 load([opts.path.data 'mcrt_geometry_input']);
 
@@ -203,7 +201,7 @@ for j = 1:length(wavl)      % monte carlo
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % generate the scoring grid and save the data
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    [ri,ai,zi,~,~,~]    = mcrt_build_grid(geom);
+    [ri,ai,zi,~,~,~]    = buildgrid(geom);
     mcrt_out.nd         = nd;
     mcrt_out.ns         = ns;
     mcrt_out.ri         = ri;
@@ -270,9 +268,8 @@ end
 %               Adf_ss(ia,ir) = Adf_ss(ia,ir)+(awt*awt);    % variance
 %           end
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%==========================================================================
+
 %% optical radii to compute the single-scattering values using Mie theory. 
-%==========================================================================
 
 % reff       = [  0.040, 0.050, 0.065, 0.080, 0.100, ...
 %                 0.120, 0.140, 0.170, 0.200, 0.240, ...
