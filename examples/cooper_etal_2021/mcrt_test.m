@@ -1,3 +1,6 @@
+
+% this is a working script not finished
+
 % might replace path settings with p = mfilename and then point to relative
 % dirs 
 
