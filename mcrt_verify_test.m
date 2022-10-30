@@ -8,7 +8,7 @@ test_fluence   = false;    % verify fluence (slower) or not
 % Sect. 5.1 Total diffuse reflectance and total transmittance
 % Sect. 5.2 Angularly resolved diffuse reflectance and transmittance
 if test_refl == true || test_ang == true
-    N   = 1e6;       % number of photon packets
+    N   = 5e6;       % number of photon packets
     Z   = 0.02;      % total thickness of medium
     g   = 0.75;      % asymmetry parameter
     ka  = 10;        % absorption coefficient (m-1)
@@ -74,7 +74,7 @@ if test_refl == true || test_ang == true
     scatter(uvdh,Rvdh,80,'filled'); 
     xlabel('exiting angle, \alpha [\pi rad]','Interpreter','tex');
     ylabel('R_d(\alpha) [sr^{-1}]','Interpreter','tex');
-    legend('This study','van de Hulst');
+    legend('iMCRT','van de Hulst');
     set(gca,'TickDir','in','XMinorTick','on','YMinorTick','on')
     
     nexttile
@@ -82,7 +82,7 @@ if test_refl == true || test_ang == true
     scatter(uvdh,Tvdh,80,'filled'); 
     xlabel('exiting angle, \alpha [\pi rad]','Interpreter','tex');
     ylabel('T_d(\alpha) [sr^{-1}]','Interpreter','tex');
-    legend('This study','van de Hulst');
+    legend('iMCRT','van de Hulst');
     set(gca,'TickDir','in','XMinorTick','on','YMinorTick','on')
     
 elseif test_fluence == true

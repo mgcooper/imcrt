@@ -59,5 +59,3 @@ function [Adf_rz,Adf,phi_rz,phi_z] = scaleA(Adf_rz,Adr_z,kabs,geom,opts)
   % phi_rz  = Adf_rz./ka;               % Eq. 4.28
   % phi_z   = Adf_z./ka;                % Eq. 4.29
 
-end
-

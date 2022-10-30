@@ -50,5 +50,3 @@ function [Rdf_ra,Rdf_r,Rdf_a,Rdf,Rdr,Rt] = scaleR(Rdf_ra,Rdr,geom,opts)
     Rdr         = Rdr/N;                                % + Rsp/N
     Rdf         = Rdf/N;                                % Eq. 4.17
     Rt          = Rdf+Rdr;
-end
-

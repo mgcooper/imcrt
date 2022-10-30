@@ -1,4 +1,3 @@
-
 function [mux,muy,muz,phis]  = mcrt_init_photons(opts,iops)
 
     N       = opts.N;

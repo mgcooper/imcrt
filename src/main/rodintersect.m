@@ -118,6 +118,5 @@ cz  = [zc0-rc,zc0+rc];  % z-limits of rod
     
 % TODO: reflect (isotropic) off the rod:
 % mu_s = -sqrt(rand); % phi = 2*pi*rand;
-end
 
 

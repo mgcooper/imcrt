@@ -23,9 +23,9 @@ A       = pi/2;             % angular detection radius              [rad]
 dr      = 0.001;            % radial bin width                      [cm]
 da      = A/30;             % angular bin width                     [rad]
 du      = da/(pi/2);        % angular bin width in cos(theta) coordinates
-nr      = roundn(R/dr,0);   % radial
-na      = roundn(A/da,0);   % angular
-nz      = roundn(Z/dz,0);   % vertical
+nr      = round(R/dr,0);    % radial
+na      = round(A/da,0);    % angular
+nz      = round(Z/dz,0);    % vertical
 
 % initialize output grids with +1 for overflow
 Adf_rz  = zeros(nz+1,nr+1);     % absorption, diffuse
@@ -60,10 +60,10 @@ for n=1:N
         if iz>nz; iz = nz+1; end                    % vertical overflow
 
 % score transmittance / reflectance
-        if z>Z                                  	% transmittance
+        if z>Z                                  	 % transmittance
             iu = ceil(acos(uz)/da);                 % angular index
             if ns==0 || uz < du/2
-                Tdr = Tdr+wt;                       % unscattered
+                Tdr = Tdr+wt;                       % direct
             else 
                 Tdf_ra(iu,ir) = Tdf_ra(iu,ir)+wt;   % diffuse
             end
@@ -73,7 +73,7 @@ for n=1:N
             iu = ceil(acos(-uz)/da);                % angular index
             if ir>nr; ir = nr+1; end                % overflow
             if ns==0 || -uz < du/2
-                Rdr = Rdr+wt;                       % unscattered
+                Rdr = Rdr+wt;                       % direct
             else
                 Rdf_ra(iu,ir) = Rdf_ra(iu,ir)+wt;   % diffuse
             end   
@@ -83,7 +83,7 @@ for n=1:N
 % score absorption/fluence
         awt = a*wt;
         if ns==0
-            Adr_z(iz)=Adr_z(iz)+awt;                % unscattered
+            Adr_z(iz)=Adr_z(iz)+awt;                % direct
         else
             Adf_rz(iz,ir)=Adf_rz(iz,ir)+awt;        % diffuse
         end
@@ -96,13 +96,21 @@ for n=1:N
             us = hg1*(hg2-(hg3/(hg4+hg5*rand))^2);
         end
         ps = two_pi*rand;                       % azimuth angle, phi_s
-        [ux,uy,uz] = mcrt_chgdir(ux,uy,uz,us,ps);
-
+        if sqrt(1-uz*uz) < 1e-12
+           % if initial direction not straight up or straight down
+            ux = sqrt(1-us*us)*cos(ps);
+            uy = sqrt(1-us*us)*sin(ps);
+            uz = sign(uz)*us;
+        else
+            % initial direction straight up or down (sin(theta)=0)
+            ux = sqrt(1-us*us)/sqrt(1-uz*uz)*(ux*uz*cos(ps)-uy*sin(ps))+ux*us;
+            uy = sqrt(1-us*us)/sqrt(1-uz*uz)*(uy*uz*cos(ps)+ux*sin(ps))+uy*us;
+            uz = -sqrt(1-us*us)*sqrt(1-uz*uz)*cos(ps)+uz*us;
+        end
 % russian roulette, keep one of every wrr photons and multiply by wrr
         if wt<wmin&&rand<(1/wrr)
             wt=wt*wrr;
         end
-
     end
 end
 

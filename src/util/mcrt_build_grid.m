@@ -53,5 +53,4 @@ function [ri,ai,zi,dr,da,dz] = mcrt_build_grid(R,A,Z,dr,da,dz)
 %     plot(ui,'o'); legend('grid centers','optimized');
 %     nexttile;
 %     plot((du/2:du:U-du/2)-ui,'o'); legend('grid centers - optimized');
-end
 

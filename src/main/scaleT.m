@@ -50,5 +50,4 @@ function [Tdf_ra,Tdf_r,Tdf_a,Tdf,Tdr,Tt] = scaleT(Tdf_ra,Tdr,geom,opts)
     Tdr     = Tdr/N;
     Tdf     = Tdf/N;                                % Eq. 4.18
     Tt      = Tdf+Tdr;
-end
 
