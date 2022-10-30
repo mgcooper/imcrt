@@ -5,10 +5,10 @@ function Setup()
 addpath(genpath([pwd() filesep 'src']));
 
 % remove paths containing example code
-try
-   rmpath([pwd() filesep 'examples']);
-catch
-end
+%try
+%   rmpath([pwd() filesep 'examples']);
+%catch
+%end
 
 
 % display install message
