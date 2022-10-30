@@ -1,5 +1,0 @@
-clearvars
-close all
-clc
-
-
