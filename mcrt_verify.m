@@ -10,7 +10,7 @@ test_fluence   = false;    % verify fluence (slower) or not
 % Sect. 5.1 Total diffuse reflectance and total transmittance
 % Sect. 5.2 Angularly resolved diffuse reflectance and transmittance
 if test_refl == true || test_ang == true
-    N   = 1e5;       % number of photon packets
+    N   = 1e6;       % number of photon packets
     Z   = 0.02;      % total thickness of medium
     g   = 0.75;      % asymmetry parameter
     ka  = 10;        % absorption coefficient (m-1)
