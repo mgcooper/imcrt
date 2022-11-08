@@ -14,8 +14,8 @@ authors:
     orcid: 'https://orcid.org/0000-0002-0165-209X'
 identifiers:
   - type: doi
-    value: 10.5281/zenodo.4827783
-    description: The DOI for version 1.1.0 of the software
+    value: 10.5281/zenodo.7302653
+    description: The DOI for version 1.2.0 of the software
 repository-code: 'https://github.com/mgcooper/imcrt'
 url: 'https://github.com/mgcooper/imcrt'
 keywords:
@@ -23,5 +23,5 @@ keywords:
   - monte carlo
   - glacier ice
 license: MIT
-version: 1.1.0
+version: 1.2.0
 date-released: '2021-05-21'
