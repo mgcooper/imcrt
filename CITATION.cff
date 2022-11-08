@@ -14,7 +14,7 @@ authors:
     orcid: 'https://orcid.org/0000-0002-0165-209X'
 identifiers:
   - type: doi
-    value: 10.5281/zenodo.7302653
+    value: 10.5281/zenodo.4579072
     description: The DOI for version 1.2.0 of the software
 repository-code: 'https://github.com/mgcooper/imcrt'
 url: 'https://github.com/mgcooper/imcrt'
