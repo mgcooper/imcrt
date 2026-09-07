@@ -79,7 +79,6 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
          end
          if z<0                      % reflection
             iu = ceil(acos(-uz)/da); % angular index
-            if ir>nr; ir = nr+1; end % overflow
             if ns==0 || -uz < du/2
                Rdr = Rdr+wt; % direct
             else
@@ -178,12 +177,10 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
    RT.Tdr = Tdr;
    RT.Tt = Tt;
 
-   RT.Adf_z = Adf_rz;
-   RT.Adf = Adf_z;
-   RT.Adf_rz = Adf_rz;
-   RT.Adr_z = Adr_z;
    RT.Adf_z = Adf_z;
    RT.Adf = Adf;
+   RT.Adf_rz = Adf_rz;
+   RT.Adr_z = Adr_z;
    RT.phi_rz = phi_rz;
    RT.phi_z = phi_z;
 
