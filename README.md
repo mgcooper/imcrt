@@ -14,7 +14,7 @@ Run `Setup.m`. If running in Octave, check `.octaverc`.
 
 ## Usage
 
-Run `mcrt_verify.m` to verify model accuracy. There are three simulations that compare model output with van De Hulst's tabulated solutions to the transfer equation. It could easily be modified for a different problem by setting the inherent optical properties and geometry to new values.
+Run `mcrt_verify.m` to verify model accuracy. It runs one case and prints a PASS/FAIL table. The `reflect` case compares hemispherical and angular reflectance and transmittance with van de Hulst's tabulated solutions (Vol. 2, Table 35). The `fluence` case runs the internal-fluence problem of Wang et al. (1995) with self-consistency checks. Set `casename` before running to pick the case. The cases live in `tests/verify/verifycases.m`. To add a case, add an entry there, add a verdict function for its reference, and add a branch to the script.
 
 The `examples` directory includes code needed to reproduce the detector interference simulations reported in the paper below. If you wanted to investigate the influence of an instrument on optical measurements, that code would be a good place to start (e.g. see `rodintersect.m`).
 

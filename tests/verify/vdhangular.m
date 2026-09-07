@@ -13,12 +13,12 @@ function [z, model, se] = vdhangular(RTs, ref)
    theta = acos(mu);
    M = numel(RTs);
    V = zeros(M, 12);
-   for m = 1:M
+   for n = 1:M
       % Reflectance fills columns 1 to 6 and transmittance 7 to 12, one
       % row per run, so the spread over rows is the run-to-run error.
-      ai = RTs{m}.grid.ai;
-      V(m, 1:6) = interp1(ai, RTs{m}.Rdf_a, theta, 'linear', RTs{m}.Rdf_a(1));
-      V(m, 7:12) = interp1(ai, RTs{m}.Tdf_a, theta, 'linear', RTs{m}.Tdf_a(1));
+      ai = RTs{n}.grid.ai;
+      V(n, 1:6) = interp1(ai, RTs{n}.Rdf_a, theta, 'linear', RTs{n}.Rdf_a(1));
+      V(n, 7:12) = interp1(ai, RTs{n}.Tdf_a, theta, 'linear', RTs{n}.Tdf_a(1));
    end
    model = mean(V, 1)';
    se = std(V, 0, 1)'/sqrt(M);

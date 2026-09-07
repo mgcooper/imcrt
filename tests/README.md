@@ -20,7 +20,8 @@ parameter sets and their seeds live in `mcrtcases.m`:
 | mini_fluence    | 0.99   | 2e3 | 44   |
 
 The albedo-0.999 fluence configuration from `mcrt_verify.m` costs about
-11,500 steps per packet and never runs in this suite.
+11,500 steps per packet. The suite runs it only at 500 packets per run,
+in `testVerify.m`.
 
 `kernelfixture.m` puts `src`, `src/derivative`, `tests/oracle`, and
 `tests/verify` on the path for one test file through
@@ -61,8 +62,19 @@ caller's global random stream when the file finishes. `testSetup.m` covers
   Hulst Table 35 at every nonzero mu: 20 runs of N=5e4 (seeds 1 to 20),
   run-spread standard error, |t| <= 3.5 with 19 degrees of freedom.
 - `verify/vdhtable35.m`: van de Hulst Table 35 references and case
-  parameters, the one source for `testBinMeasures.m`; `mcrt_verify.m` and
-  the overnight driver adopt it in Beads .16 and .17.
+  parameters, the one source for the tests and `mcrt_verify.m`.
+- `testVerify.m`: the verification layer: case table, van de Hulst and
+  fluence verdict tables, and `mcrt_verify.m` running standalone for each
+  case at its interactive size.
+- `verify/verifycases.m`: the cases `mcrt_verify.m` runs, with kernel
+  inputs, run count, packets, seeds, and the t cutoff.
+- `verify/vdhverdict.m`: the 16-row PASS/FAIL verdict for the reflect
+  case from M runs (hemispherical Rd, Tt, Tdr, Rdr and twelve angular
+  rows). It is a struct of plain arrays, so it prints on Octave too.
+- `verify/fluenceverdict.m`: the 12-row self-consistency verdict for the
+  fluence case (energy, ten direct-beam depth bins, surface fluence).
+- `verify/printverdict.m`: prints a verdict struct with `fprintf` and
+  returns the number of passing rows.
 - `verify/vdhangular.m`: interpolates each run's angular tallies to the
   table's mu values and returns z-scores from the spread over runs.
 - `testRoulette.m`: roulette is terminate-or-boost and unbiased, and a
