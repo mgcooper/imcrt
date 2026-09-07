@@ -110,22 +110,6 @@ function testClampsOnCraftedIndices(testCase)
    testCase.verifyEqual(returned, expected);
 end
 
-function w = runblock(block, v)
-   % Evaluate one kernel block from src/mcrt.m with the fields of v as its
-   % workspace and return every variable afterward. The block's break lines
-   % are removed because eval parses the text outside the kernel's loop.
-   names = fieldnames(v);
-   for n = 1:numel(names)
-      eval([names{n} ' = v.' names{n} ';']);
-   end
-   eval(regexprep(block, '\n[ \t]*break\>[^\n]*', ''));
-   vars = who;
-   w = struct();
-   for n = 1:numel(vars)
-      w.(vars{n}) = eval(vars{n});
-   end
-end
-
 function testGrazingExitsLandInLastBin(testCase)
    % Isotropic scattering (g = 0) produces near-grazing scattered exits.
    % Direct means ns == 0 only, so they are diffuse and belong in the last

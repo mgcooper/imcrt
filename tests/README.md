@@ -54,8 +54,12 @@ caller's global random stream when the file finishes. `testSetup.m` covers
 - `testFluenceBalance.m`: ka times the volume integral of the fluence
   returns the absorbed weight, the direct beam's absorption sits in radial
   bin 1, and a purely absorbing slab is Beer-Lambert.
+- `testRoulette.m`: roulette is terminate-or-boost and unbiased, and a
+  deep absorbing slab conserves weight to 1e-6.
 - `kernellines.m`: reads a block of `src/mcrt.m` between two marker
   comments so tests can evaluate the kernel's inline code.
+- `runblock.m`: evaluates such a block with a struct as its workspace and
+  returns every variable afterward.
 - `testBuildgrid.m`: grid lengths, orientation, optimized centers, and
   widths for integral inputs; current floor-based lengths for non-integral
   inputs (characterization until hardening, defect K).

@@ -1,7 +1,7 @@
 function tests = testEnergyConservation
    % Every packet's weight must end in reflectance, transmittance, or
-   % absorption. The 1e-2 tolerance allows the Russian-roulette weight leak
-   % (defect N).
+   % absorption. Russian roulette is unbiased but noisy: its noise on the
+   % balance is below 1e-5 for the shared cases, so 1e-4 leaves margin.
    tests = functiontests(localfunctions);
 end
 
@@ -21,6 +21,6 @@ function testWeightIsConserved(testCase)
       returned = RT.Rdf + RT.Rdr + RT.Tdf + RT.Tdr + RT.Adf ...
          + sum(RT.Adr_z .* RT.grid.dz);
       expected = 1;
-      testCase.verifyEqual(returned, expected, 'AbsTol', 1e-2, c.name);
+      testCase.verifyEqual(returned, expected, 'AbsTol', 1e-4, c.name);
    end
 end

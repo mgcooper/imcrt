@@ -22,7 +22,7 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
    two_pi = 2*pi;
 
    % default settings
-   wmin = 1e-4; % min photon weight before discarding it
+   wmin = 1e-4; % photon weight below which russian roulette plays
    wrr = 10;    % 1/wrr photons are reinjected (russian roulette)
 
    % grid settings
@@ -53,8 +53,8 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
       uz = 1; % = 1 for vertical, = 1-2*rand for isotropic
       ns = 0; % number of scattering events
 
-      % keep going until min intensity or z>0 is satisfied
-      while wt > wmin
+      % Propagate the packet until roulette kills it or it exits the slab.
+      while wt > 0
          l = -c*log(rand); % path length
          x = x+ux*l;       % new x-position
          y = y+uy*l;       % new y-position
@@ -136,9 +136,16 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
             ux = uxn;
             uy = uyn;
          end
-         % russian roulette, keep one of every wrr photons and multiply by wrr
-         if wt<wmin&&rand<(1/wrr)
-            wt = wt*wrr;
+         % russian roulette (Wang et al. 1995, Sect. 3.9): a packet below wmin
+         % survives with probability 1/wrr carrying wrr times its weight, or
+         % dies. A survivor can still sit below wmin, so the loop runs on
+         % wt > 0 and it plays again next step instead of being dropped (N).
+         if wt < wmin
+            if rand < 1/wrr
+               wt = wt*wrr;
+            else
+               wt = 0;
+            end
          end
       end
    end
