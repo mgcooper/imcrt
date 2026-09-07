@@ -17,7 +17,7 @@ function testWeightIsConserved(testCase)
    for k = 1:numel(cases)
       c = cases(k);
       rng(c.seed, 'twister');
-      RT = mcrt(c.ka, c.ks, c.g, c.Z, c.dz, 1e3);
+      RT = mcrt(c.ka, c.ks, c.g, c.Z, c.dz, c.N);
       returned = RT.Rdf + RT.Rdr + RT.Tdf + RT.Tdr + RT.Adf ...
          + sum(RT.Adr_z .* RT.grid.dz);
       expected = 1;

@@ -15,9 +15,9 @@ function testSameSeedSameOutput(testCase)
    c = mcrtcases();
    c = c(1);
    rng(c.seed, 'twister');
-   returned = mcrt(c.ka, c.ks, c.g, c.Z, c.dz, 1e3);
+   returned = mcrt(c.ka, c.ks, c.g, c.Z, c.dz, c.N);
    rng(c.seed, 'twister');
-   expected = mcrt(c.ka, c.ks, c.g, c.Z, c.dz, 1e3);
+   expected = mcrt(c.ka, c.ks, c.g, c.Z, c.dz, c.N);
    testCase.verifyEqual(returned, expected);
 end
 
@@ -26,8 +26,8 @@ function testDifferentSeedDifferentOutput(testCase)
    c = mcrtcases();
    c = c(1);
    rng(c.seed, 'twister');
-   returned = mcrt(c.ka, c.ks, c.g, c.Z, c.dz, 1e3);
+   returned = mcrt(c.ka, c.ks, c.g, c.Z, c.dz, c.N);
    rng(c.seed + 1, 'twister');
-   expected = mcrt(c.ka, c.ks, c.g, c.Z, c.dz, 1e3);
+   expected = mcrt(c.ka, c.ks, c.g, c.Z, c.dz, c.N);
    testCase.verifyNotEqual(returned.Rdf_ra, expected.Rdf_ra);
 end
