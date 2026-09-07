@@ -21,10 +21,13 @@ function [ux,uy,uz] = chgdir(ux,uy,uz,us,phis)
       uy = sintheta_s*sinphi_s;
       uz = s*us;
    else
-      % if initial direction not straight up or straight down
-      ux = sintheta_s/sintheta*(ux*uz*cosphi_s-uy*sinphi_s) + ux*us;
-      uy = sintheta_s/sintheta*(uy*uz*cosphi_s+ux*sinphi_s) + uy*us;
+      % if initial direction not straight up or straight down. The
+      % temporaries uxn and uyn keep uy from reading the updated ux (B).
+      uxn = sintheta_s/sintheta*(ux*uz*cosphi_s-uy*sinphi_s) + ux*us;
+      uyn = sintheta_s/sintheta*(uy*uz*cosphi_s+ux*sinphi_s) + uy*us;
       uz = -sintheta_s*sintheta*cosphi_s + uz*us;
+      ux = uxn;
+      uy = uyn;
    end
 
    % should = 0

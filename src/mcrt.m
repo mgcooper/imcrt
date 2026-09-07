@@ -104,16 +104,26 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
             us = hg1*(hg2-(hg3/(hg4+hg5*rand))^2);
          end
          ps = two_pi*rand; % azimuth angle, phi_s
-         if sqrt(1-uz*uz) < 1e-12
+         % new direction cosines: an inline copy of chgdir, because a function
+         % call in this loop costs more than the scattering itself. The
+         % temporaries uxn and uyn keep uy from reading the updated ux (B).
+         % tests/testChgdirOracle.m evaluates this block against chgdir.
+         sinth = sqrt(1-uz*uz);
+         sinths = sqrt(1-us*us);
+         cps = cos(ps);
+         sps = sin(ps);
+         if sinth < 1e-12
             % initial direction straight up or down (sin(theta)=0)
-            ux = sqrt(1-us*us)*cos(ps);
-            uy = sqrt(1-us*us)*sin(ps);
+            ux = sinths*cps;
+            uy = sinths*sps;
             uz = sign(uz)*us;
          else
             % if initial direction not straight up or straight down
-            ux = sqrt(1-us*us)/sqrt(1-uz*uz)*(ux*uz*cos(ps)-uy*sin(ps))+ux*us;
-            uy = sqrt(1-us*us)/sqrt(1-uz*uz)*(uy*uz*cos(ps)+ux*sin(ps))+uy*us;
-            uz = -sqrt(1-us*us)*sqrt(1-uz*uz)*cos(ps)+uz*us;
+            uxn = sinths/sinth*(ux*uz*cps-uy*sps)+ux*us;
+            uyn = sinths/sinth*(uy*uz*cps+ux*sps)+uy*us;
+            uz = -sinths*sinth*cps+uz*us;
+            ux = uxn;
+            uy = uyn;
          end
          % russian roulette, keep one of every wrr photons and multiply by wrr
          if wt<wmin&&rand<(1/wrr)
