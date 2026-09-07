@@ -45,6 +45,14 @@ caller's global random stream when the file finishes. `testSetup.m` covers
 - `testRotationMatrix.m`: the oracle is the minimal proper rotation that
   maps a onto b for generic, parallel, antiparallel, and near-antiparallel
   pairs.
+- `testChgdirOracle.m`: the direction update keeps the unit norm, deflects
+  by the sampled cosine, matches the oracle's azimuth spacing, and the
+  inline copy in `mcrt.m` agrees with `chgdir`.
+- `testDirectBeam.m`: direct transmittance is Beer-Lambert, direct
+  reflectance is zero, and on-axis, grazing, and crafted exits land in
+  valid bins.
+- `kernellines.m`: reads a block of `src/mcrt.m` between two marker
+  comments so tests can evaluate the kernel's inline code.
 - `testBuildgrid.m`: grid lengths, orientation, optimized centers, and
   widths for integral inputs; current floor-based lengths for non-integral
   inputs (characterization until hardening, defect K).
@@ -57,11 +65,12 @@ first and last element. A polynomial hash of its bytes modulo a 25-bit prime
 completes the record. Every number is printed with `%.17g`. The hash changes
 with any bit or any element order.
 
-The baseline was captured on the pre-fix kernel on purpose. A
-behavior-neutral commit (style, dead code) must leave the file
-bit-identical, which is the proof that it is neutral. Only a commit that
-carries a physics fix may re-baseline, and it must quantify the delta in
-its commit message.
+The baseline matches the kernel at HEAD. A behavior-neutral commit
+(style, dead code) must leave the file bit-identical, which is the proof
+that it is neutral. Only a commit that carries a physics fix may
+re-baseline, and it must quantify the delta in its commit message. The
+file's history therefore holds one version per physics fix; its first
+version, from commit 3c99b8d, digests the pre-fix kernel.
 
 Re-baseline with one command from the repo root:
 

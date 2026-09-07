@@ -1,8 +1,9 @@
 function tests = testGolden
    % Golden-digest regression: the seeded cases must reproduce the tracked
-   % baseline line for line. The baseline was captured on the pre-fix kernel
-   % on purpose, so a behavior-neutral commit is provably neutral. A physics
-   % fix re-baselines in the same commit with mcrtgolden('write').
+   % baseline line for line. The baseline matches the kernel at HEAD, so a
+   % behavior-neutral commit must leave it bit-identical. A physics fix
+   % re-baselines in the same commit with mcrtgolden('write') and states
+   % the delta in its commit message.
    tests = functiontests(localfunctions);
 end
 

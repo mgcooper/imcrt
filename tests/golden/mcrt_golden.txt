@@ -107,25 +107,25 @@ vdh_reflectance grid.dz.first 0.001
 vdh_reflectance grid.dz.last 0.0010000000000000009
 vdh_reflectance grid.dz.checksum 9010414
 absorbing Rdf_ra.size [30 2001]
-absorbing Rdf_ra.sum 1697.9973583532926
-absorbing Rdf_ra.sumsq 99208.058714959101
+absorbing Rdf_ra.sum 1699.2729247261925
+absorbing Rdf_ra.sumsq 99209.685784530768
 absorbing Rdf_ra.first 263.35583804381798
 absorbing Rdf_ra.last 0
-absorbing Rdf_ra.checksum 16167191
+absorbing Rdf_ra.checksum 9241795
 absorbing Rdf_r.size [1 2001]
-absorbing Rdf_r.sum 137.73242198343124
-absorbing Rdf_r.sumsq 1758.2762149453747
+absorbing Rdf_r.sum 137.74339820892644
+absorbing Rdf_r.sumsq 1758.3158134986602
 absorbing Rdf_r.first 19.98190310518746
 absorbing Rdf_r.last 0
-absorbing Rdf_r.checksum 11414832
+absorbing Rdf_r.checksum 26748978
 absorbing Rdf_a.size [30 1]
-absorbing Rdf_a.sum 0.025814297287007671
-absorbing Rdf_a.sumsq 2.5735795741161335e-05
+absorbing Rdf_a.sum 0.025817338660947285
+absorbing Rdf_a.sumsq 2.5736754036544977e-05
 absorbing Rdf_a.first 0.00099957317324229607
-absorbing Rdf_a.last 0.00015602248310224171
-absorbing Rdf_a.checksum 11007971
-absorbing Rdf 0.0051797099999999997
-absorbing Rdr 1.0000000000000002e-06
+absorbing Rdf_a.last 0.00015906385704185654
+absorbing Rdf_a.checksum 29571974
+absorbing Rdf 0.0051807099999999998
+absorbing Rdr 0
 absorbing Tdf_ra.size [30 2001]
 absorbing Tdf_ra.sum 526.29249091727172
 absorbing Tdf_ra.sumsq 18231.749447473667

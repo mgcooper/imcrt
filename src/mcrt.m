@@ -30,7 +30,6 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
    A = pi/2;         % angular detection radius              [rad]
    dr = 0.001;       % radial bin width                      [cm]
    da = A/30;        % angular bin width                     [rad]
-   du = da/(pi/2);   % angular bin width in cos(theta) coordinates
    nr = round(R/dr); % radial
    na = round(A/da); % angular
    nz = round(Z/dz); % vertical
@@ -61,25 +60,37 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
          y = y+uy*l;       % new y-position
          z = z+uz*l;       % new z-position
 
-         % grid indices
+         % grid indices. The lower clamps catch r = 0 and z = 0 exactly,
+         % which ceil maps to bin 0 (defect I).
          ir = ceil(sqrt(x*x+y*y)/dr); % radial index
          iz = ceil(z/dz);             % vertical index
+         if ir<1; ir = 1; end         % radial on-axis
          if ir>nr; ir = nr+1; end     % radial overflow
+         if iz<1; iz = 1; end         % vertical at the surface
          if iz>nz; iz = nz+1; end     % vertical overflow
 
-         % score transmittance / reflectance
-         if z>Z                     % transmittance
-            iu = ceil(acos(uz)/da); % angular index
-            if ns==0 || uz < du/2
+         % score transmittance / reflectance. Direct means unscattered
+         % (ns==0) only: a scattered grazing exit is diffuse (defect A). The
+         % angular index is clamped because acos(1) = 0 gives bin 0 on axis
+         % and rounding at grazing can give bin na+1 (defect J).
+         if z>Z                       % transmittance
+            iu = ceil(acos(uz)/da);   % angular index
+            if iu<1; iu = 1; end      % on axis
+            if iu>na; iu = na; end    % grazing
+            if ns==0
                Tdr = Tdr+wt; % direct
             else
                Tdf_ra(iu,ir) = Tdf_ra(iu,ir)+wt; % diffuse
             end
             break % photon escapes
          end
-         if z<0                      % reflection
-            iu = ceil(acos(-uz)/da); % angular index
-            if ns==0 || -uz < du/2
+         if z<0                       % reflection
+            iu = ceil(acos(-uz)/da);  % angular index
+            if iu<1; iu = 1; end      % on axis
+            if iu>na; iu = na; end    % grazing
+            if ns==0
+               % unreachable for the vertical source (no specular term);
+               % kept for the isotropic source noted at the uz = 1 line
                Rdr = Rdr+wt; % direct
             else
                Rdf_ra(iu,ir) = Rdf_ra(iu,ir)+wt; % diffuse
