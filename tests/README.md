@@ -75,8 +75,26 @@ caller's global random stream when the file finishes. `testSetup.m` covers
   fluence case (energy, ten direct-beam depth bins, surface fluence).
 - `verify/printverdict.m`: prints a verdict struct with `fprintf` and
   returns the number of passing rows.
-- `verify/vdhangular.m`: interpolates each run's angular tallies to the
-  table's mu values and returns z-scores from the spread over runs.
+- `verify/vdhovernight.m`: the multi-run driver (MATLAB only). It runs
+  both cases at the full sizes in `verifycases.m` and checkpoints every
+  run to a `.mat` file with the kernel hash, version, inputs, and run
+  time. The fluence report includes the phi_z depth profile. It
+  resumes from matching checkpoints, recomputes stale ones, and writes a
+  dated PASS/FAIL report. Hemispherical rows get a 5e-4 absolute allowance
+  and angular rows a 2% relative allowance for binning systematics. The
+  report names any row that passed only by an allowance.
+- `verify/variancecheck.m`: run-to-run variance of Rd and Tt against the
+  binomial estimate; a ratio above 2 fails.
+- `verify/reportname.m`: a dated report path that takes a numeric suffix
+  when the name is taken, so no report is ever overwritten.
+- `testOvernight.m`: the driver at scale 1e-3. It checks that the driver:
+  - creates the output folder and writes 36 checkpoints and a report;
+  - resumes from the checkpoints and recomputes stale or unreadable ones;
+  - keeps every report and reaches OVERALL FAIL with tmax = 0;
+  - errors on an unwritable folder and closes the report after an error.
+- `verify/vdhangular.m`: interpolates each run's angular tallies (pchip
+  between bin centers) to the table's mu values and returns z-scores from
+  the spread over runs.
 - `testRoulette.m`: roulette is terminate-or-boost and unbiased, and a
   deep absorbing slab conserves weight to 1e-6.
 - `kernellines.m`: reads a block of `src/mcrt.m` between two marker

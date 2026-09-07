@@ -20,10 +20,10 @@ function testCasesCarryRunParameters(testCase)
       c = verifycases(names{n});
       returned = sort(fieldnames(c));
       expected = sort({'name'; 'ka'; 'ks'; 'g'; 'Z'; 'dz'; 'M'; 'N'; ...
-         'seeds'; 'tmax'});
+         'seeds'; 'tmax'; 'full'});
       testCase.verifyEqual(returned, expected, names{n});
-      returned = numel(c.seeds);
-      expected = c.M;
+      returned = [numel(c.seeds), numel(c.full.seeds)];
+      expected = [c.M, c.full.M];
       testCase.verifyEqual(returned, expected, names{n});
    end
    testCase.verifyError(@() verifycases('nope'), 'verifycases:unknownCase');
@@ -32,7 +32,8 @@ end
 function testVdhVerdictRules(testCase)
    % Four short runs give the 16-row verdict. Rdr passes by the exact-zero
    % rule and fails once any run reports a nonzero Rdr. Scaling the
-   % reference reflectance by 1.5 flips Rd to FAIL and nothing else.
+   % reference reflectance by 1.5 flips Rd to FAIL and nothing else. The
+   % absolute allowance applies to Rd and Tt only.
    ref = vdhtable35();
    RTs = runcase(ref, 4, 2e4, 1:4);
    V = vdhverdict(RTs, ref, 4);
@@ -49,6 +50,35 @@ function testVdhVerdictRules(testCase)
    leaky{2}.Rdr = 1e-3;
    V = vdhverdict(leaky, ref, 4);
    returned = V.verdict{4};
+   expected = 'FAIL';
+   testCase.verifyEqual(returned, expected);
+   % An absolute allowance rescues a hemispherical row that misses by less
+   % than the allowance and marks it in byallowance; without it the row fails.
+   % Tt may be rescued too at this tiny tmax; Tdr and the angular rows
+   % never are.
+   V = vdhverdict(RTs, ref, 4);
+   near = ref;
+   near.Rd = V.model(1) + 3e-4;
+   V = vdhverdict(RTs, near, 0.1, 5e-4);
+   returned = {V.verdict{1}, V.byallowance(1), any(V.byallowance(3:end))};
+   expected = {'PASS', true, false};
+   testCase.verifyEqual(returned, expected);
+   V = vdhverdict(RTs, near, 0.1);
+   returned = V.verdict{1};
+   expected = 'FAIL';
+   testCase.verifyEqual(returned, expected);
+   % The relative allowance rescues an angular row (row 11, T at mu = 0.1)
+   % that misses by 1% when reltol is 2%; without reltol it fails. Rows 1
+   % to 4 never use the relative allowance, so none of them is marked.
+   V = vdhverdict(RTs, ref, 4);
+   skew = ref;
+   skew.T_sr(2) = V.model(11)/1.01;
+   V = vdhverdict(RTs, skew, 0.1, 0, 0.02);
+   returned = {V.verdict{11}, V.byallowance(11), any(V.byallowance(1:4))};
+   expected = {'PASS', true, false};
+   testCase.verifyEqual(returned, expected);
+   V = vdhverdict(RTs, skew, 0.1);
+   returned = V.verdict{11};
    expected = 'FAIL';
    testCase.verifyEqual(returned, expected);
 end
@@ -86,6 +116,42 @@ function testFluenceVerdictRules(testCase)
    returned = V.verdict{end};
    expected = 'FAIL';
    testCase.verifyEqual(returned, expected);
+end
+
+function testVarianceCheckThreshold(testCase)
+   % Synthetic runs with a known spread: a ratio at or below 2 passes and
+   % a ratio above 2 fails, for Rd and Tt independently.
+   N = 1e4;
+   p = 0.1;
+   sigma = sqrt(p*(1 - p)/N);
+   RTs = cell(1, 4);
+   for n = 1:4
+      RTs{n} = struct('Rdf', p + sigma*(n - 2.5), 'Tt', p + 3*sigma*(n - 2.5));
+   end
+   W = variancecheck(RTs, N);
+   returned = {W.verdict{1}, W.verdict{2}, W.model(1) <= 2, W.model(2) > 2};
+   expected = {'PASS', 'FAIL', true, true};
+   testCase.verifyEqual(returned, expected);
+end
+
+function testAngularUsesPchip(testCase)
+   % Synthetic angular tallies that curve like the transmittance near
+   % grazing: the helper must return the pchip interpolant, not the linear
+   % one, at the table's mu values.
+   ref = vdhtable35();
+   RT = struct();
+   RT.grid.ai = ((0.5:29.5)'*pi/60);
+   RT.Rdf_a = exp(-3*RT.grid.ai);
+   RT.Tdf_a = cos(RT.grid.ai).^4;
+   [~, model] = vdhangular({RT, RT}, ref);
+   theta = acos(ref.mu(2:end));
+   returned = model;
+   expected = [interp1(RT.grid.ai, RT.Rdf_a, theta, 'pchip', RT.Rdf_a(1)), ...
+      interp1(RT.grid.ai, RT.Tdf_a, theta, 'pchip', RT.Tdf_a(1))]';
+   testCase.verifyEqual(returned, expected, 'AbsTol', 1e-15);
+   linear = [interp1(RT.grid.ai, RT.Rdf_a, theta, 'linear', RT.Rdf_a(1)), ...
+      interp1(RT.grid.ai, RT.Tdf_a, theta, 'linear', RT.Tdf_a(1))]';
+   testCase.verifyNotEqual(returned, linear);
 end
 
 function testPrintVerdictCountsPasses(testCase)

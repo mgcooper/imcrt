@@ -46,3 +46,6 @@ codegen/
 # project's state is machine-local, not source.
 **/resources/*
 !**/resources/project/
+
+# Overnight verification checkpoints and reports (vdhovernight)
+/verify_out/
