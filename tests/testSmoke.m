@@ -1,6 +1,7 @@
 function tests = testSmoke
-   % Smoke tests for mcrt on each shared case at its own N. The output struct must
-   % hold every field, shapes tied to the grid, and finite non-negative values.
+   % Smoke tests for mcrt on each shared case at its own N. The output struct
+   % must hold every field, shapes tied to the grid, and finite non-negative
+   % values.
    tests = functiontests(localfunctions);
 end
 

@@ -22,10 +22,11 @@ parameter sets and their seeds live in `mcrtcases.m`:
 The albedo-0.999 fluence configuration from `mcrt_verify.m` costs about
 11,500 steps per packet and never runs in this suite.
 
-`kernelfixture.m` puts `src` and `src/derivative` on the path for one test
-file through `matlab.unittest.fixtures.PathFixture`. `runtests` therefore
-works without `Setup`. The fixture restores the caller's global random
-stream when the file finishes. `testSetup.m` covers `Setup.m` itself.
+`kernelfixture.m` puts `src`, `src/derivative`, and `tests/oracle` on the
+path for one test file through `matlab.unittest.fixtures.PathFixture`.
+`runtests` therefore works without `Setup`. The fixture restores the
+caller's global random stream when the file finishes. `testSetup.m` covers
+`Setup.m` itself.
 
 ## Files
 
@@ -39,6 +40,11 @@ stream when the file finishes. `testSetup.m` covers `Setup.m` itself.
   within 1e-2 of 1.
 - `testGolden.m`: the digest of every output for every case matches
   `golden/mcrt_golden.txt` line for line.
+- `oracle/RotationMatrix.m`: the independent minimal rotation that checks
+  the direction-cosine update. The production path excludes it.
+- `testRotationMatrix.m`: the oracle is the minimal proper rotation that
+  maps a onto b for generic, parallel, antiparallel, and near-antiparallel
+  pairs.
 - `testBuildgrid.m`: grid lengths, orientation, optimized centers, and
   widths for integral inputs; current floor-based lengths for non-integral
   inputs (characterization until hardening, defect K).
