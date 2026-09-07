@@ -51,6 +51,9 @@ caller's global random stream when the file finishes. `testSetup.m` covers
 - `testDirectBeam.m`: direct transmittance is Beer-Lambert, direct
   reflectance is zero, and on-axis, grazing, and crafted exits land in
   valid bins.
+- `testFluenceBalance.m`: ka times the volume integral of the fluence
+  returns the absorbed weight, the direct beam's absorption sits in radial
+  bin 1, and a purely absorbing slab is Beer-Lambert.
 - `kernellines.m`: reads a block of `src/mcrt.m` between two marker
   comments so tests can evaluate the kernel's inline code.
 - `testBuildgrid.m`: grid lengths, orientation, optimized centers, and

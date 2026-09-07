@@ -59,11 +59,11 @@ vdh_reflectance Adr_z.first 9.8999999999998654
 vdh_reflectance Adr_z.last 0
 vdh_reflectance Adr_z.checksum 23509813
 vdh_reflectance phi_rz.size [21 2001]
-vdh_reflectance phi_rz.sum 1102157.4124763254
-vdh_reflectance phi_rz.sumsq 25043912289.336308
-vdh_reflectance phi_rz.first 15374.163840603884
+vdh_reflectance phi_rz.sum 3418676.4910796485
+vdh_reflectance phi_rz.sumsq 542135104864.9527
+vdh_reflectance phi_rz.first 281261.40064349794
 vdh_reflectance phi_rz.last 0
-vdh_reflectance phi_rz.checksum 30237305
+vdh_reflectance phi_rz.checksum 675047
 vdh_reflectance phi_z.size [21 1]
 vdh_reflectance phi_z.sum 24.130798128432819
 vdh_reflectance phi_z.sumsq 29.361193937505295
@@ -167,11 +167,11 @@ absorbing Adr_z.first 69.102000000004551
 absorbing Adr_z.last 0
 absorbing Adr_z.checksum 16418008
 absorbing phi_rz.size [11 2001]
-absorbing phi_rz.sum 20854.898714181832
-absorbing phi_rz.sumsq 21922720.585612483
-absorbing phi_rz.first 2884.9460255400013
+absorbing phi_rz.sum 549948.92255904281
+absorbing phi_rz.sumsq 72306766173.295105
+absorbing phi_rz.first 209095.26967935645
 absorbing phi_rz.last 0
-absorbing phi_rz.checksum 3651936
+absorbing phi_rz.checksum 18155135
 absorbing phi_z.size [11 1]
 absorbing phi_z.sum 2.1904895200000736
 absorbing phi_z.sumsq 1.1140376271032981
@@ -275,11 +275,11 @@ mini_fluence Adr_z.first 0.82099999999998707
 mini_fluence Adr_z.last 0
 mini_fluence Adr_z.checksum 29676303
 mini_fluence phi_rz.size [21 2001]
-mini_fluence phi_rz.sum 751708.79808679037
-mini_fluence phi_rz.sumsq 22788212113.985168
-mini_fluence phi_rz.first 49371.079896875519
+mini_fluence phi_rz.sum 1284854.7310219321
+mini_fluence phi_rz.sumsq 159053051013.95529
+mini_fluence phi_rz.first 269869.48536674981
 mini_fluence phi_rz.last 0
-mini_fluence phi_rz.checksum 30304548
+mini_fluence phi_rz.checksum 20539846
 mini_fluence phi_z.size [21 1]
 mini_fluence phi_z.sum 33.709141254322944
 mini_fluence phi_z.sumsq 58.049509633277616
