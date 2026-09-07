@@ -39,6 +39,9 @@ stream when the file finishes. `testSetup.m` covers `Setup.m` itself.
   within 1e-2 of 1.
 - `testGolden.m`: the digest of every output for every case matches
   `golden/mcrt_golden.txt` line for line.
+- `testBuildgrid.m`: grid lengths, orientation, optimized centers, and
+  widths for integral inputs; current floor-based lengths for non-integral
+  inputs (characterization until hardening, defect K).
 
 ## Golden digest
 
