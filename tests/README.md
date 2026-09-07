@@ -85,6 +85,21 @@ caller's global random stream when the file finishes. `testSetup.m` covers
   report names any row that passed only by an allowance.
 - `verify/variancecheck.m`: run-to-run variance of Rd and Tt against the
   binomial estimate; a ratio above 2 fails.
+- `verify/impactreport.m`: writes `docs/impact-report.md`: every shared
+  case through the pre-fix kernel and each fix tag (extracted from git),
+  with attribution per quantity, plus the retrospective against the
+  frozen 2021 verification script. MATLAB only.
+- `verify/impactquantities.m`, `verify/impactattribution.m`,
+  `verify/relchange.m`, `verify/pairedratio.m`, `verify/unpairedratio.m`,
+  `verify/srcmatches.m`, `verify/impactargs.m`, `verify/srctext.m`,
+  `verify/agreetext.m`: the quantity summary of one run, the rule that
+  names the fixes at which a quantity changed, the change and ratio
+  texts, the check that the worktree kernel matches a tag, the report
+  defaults, and the two report sentences whose branches depend on the
+  source state and the data. The source check is tested in a
+  scratch git repository, not the live worktree.
+- `testImpact.m`: the attribution rule, the quantity summary, and the
+  report generator at a tiny size.
 - `verify/reportname.m`: a dated report path that takes a numeric suffix
   when the name is taken, so no report is ever overwritten.
 - `testOvernight.m`: the driver at scale 1e-3. It checks that the driver:
