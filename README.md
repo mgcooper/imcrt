@@ -6,7 +6,7 @@ ice Monte Carlo Radiative Transfer.
 
 ## Dependencies
 
-A working installation of Matlab or GNU Octave. Confirmed to run on Matlab R2020b and Octave 7.2.0, but it should run on any recent release, and there should not be any toolbox dependencies.
+A working installation of Matlab or GNU Octave. Confirmed to run on core Matlab R2020b and core Octave 7.2.0 (no toolboxes or packages required), but it should run on any recent release. The project has no dependencies other than the code included here.
 
 ## Install
 
