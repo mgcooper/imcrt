@@ -6,7 +6,7 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
    %  asymmetry g. RT holds the reflectance (R), transmittance (T),
    %  absorption (A), and fluence (phi) tallies, diffuse (df) and direct
    %  (dr), resolved by radius (r), angle (a), and depth (z) on a grid with
-   %  vertical spacing dz, plus that grid in RT.grid.
+   %  vertical spacing dz, plus that grid and its bin measures in RT.grid.
 
    % optical coefficients
    w = ks/(ka+ks); % single-scattering albedo          [-]
@@ -150,12 +150,20 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
       end
    end
 
-   % build a grid to calculate observable quantities (eq. 4.1/4.2 Wang)
-   [ri,ai,zi,dr,da,dz] = buildgrid(R,A,Z,dr,da,dz);
-
-   dsr = 2*pi.*sin(ai).*da; % solid angle per angular bin       [sr]
-   dA = 2*pi.*ri.*dr;       % annulus area per radial bin       [cm^2]
-   dV = dA.*dz;             % volume per (z, r) bin, nz+1 x nr+1 [cm^3]
+   % build a grid to calculate observable quantities (eq. 4.1/4.2 Wang).
+   % buildgrid's shifted centers are reporting coordinates (Eqs. 8 and 14
+   % of the paper it cites), not bin measures, so the measures below come
+   % from the bin edges instead (defect S). Each overflow bin takes one more
+   % bin width.
+   [ri,ai,zi] = buildgrid(R,A,Z,dr,da,dz);
+   redge = (0:nr+1)*dr;  % radial bin edges, overflow included     [cm]
+   aedge = (0:na)'*da;   % angular bin edges                       [rad]
+   dr = dr*ones(1,nr+1); % radial bin widths                       [cm]
+   da = da*ones(na,1);   % angular bin widths                      [rad]
+   dz = dz*ones(nz+1,1); % vertical bin widths, overflow included  [cm]
+   dA = pi*(redge(2:end).^2-redge(1:end-1).^2);      % annulus area  [cm^2]
+   dsr = 2*pi*(cos(aedge(1:end-1))-cos(aedge(2:end))); % solid angle [sr]
+   dV = dA.*dz;          % volume per (z, r) bin, nz+1 x nr+1      [cm^3]
    cosa = cos(ai);
 
    % sum the 2-d arrays into 1-d and 0-d arrays (R=reflection, T=transmission)
@@ -229,5 +237,7 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
    RT.grid.dr = dr;
    RT.grid.da = da;
    RT.grid.dz = dz;
+   RT.grid.dA = dA;
+   RT.grid.dsr = dsr;
 
 end

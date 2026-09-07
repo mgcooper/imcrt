@@ -22,8 +22,9 @@ parameter sets and their seeds live in `mcrtcases.m`:
 The albedo-0.999 fluence configuration from `mcrt_verify.m` costs about
 11,500 steps per packet and never runs in this suite.
 
-`kernelfixture.m` puts `src`, `src/derivative`, and `tests/oracle` on the
-path for one test file through `matlab.unittest.fixtures.PathFixture`.
+`kernelfixture.m` puts `src`, `src/derivative`, `tests/oracle`, and
+`tests/verify` on the path for one test file through
+`matlab.unittest.fixtures.PathFixture`.
 `runtests` therefore works without `Setup`. The fixture restores the
 caller's global random stream when the file finishes. `testSetup.m` covers
 `Setup.m` itself.
@@ -54,6 +55,16 @@ caller's global random stream when the file finishes. `testSetup.m` covers
 - `testFluenceBalance.m`: ka times the volume integral of the fluence
   returns the absorbed weight, the direct beam's absorption sits in radial
   bin 1, and a purely absorbing slab is Beer-Lambert.
+- `testBinMeasures.m`: the solid angles and annulus areas in `RT.grid`
+  are the exact bin measures, resolved tallies sum back to the
+  hemispherical fractions, and the diffuse angular tables match van de
+  Hulst Table 35 at every nonzero mu: 20 runs of N=5e4 (seeds 1 to 20),
+  run-spread standard error, |t| <= 3.5 with 19 degrees of freedom.
+- `verify/vdhtable35.m`: van de Hulst Table 35 references and case
+  parameters, the one source for `testBinMeasures.m`; `mcrt_verify.m` and
+  the overnight driver adopt it in Beads .16 and .17.
+- `verify/vdhangular.m`: interpolates each run's angular tallies to the
+  table's mu values and returns z-scores from the spread over runs.
 - `testRoulette.m`: roulette is terminate-or-boost and unbiased, and a
   deep absorbing slab conserves weight to 1e-6.
 - `kernellines.m`: reads a block of `src/mcrt.m` between two marker

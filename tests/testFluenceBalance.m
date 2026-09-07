@@ -22,8 +22,7 @@ function testAbsorptionBalance(testCase)
       c = cases(n);
       rng(c.seed, 'twister');
       RT = mcrt(c.ka, c.ks, c.g, c.Z, c.dz, c.N);
-      dA = 2*pi*RT.grid.ri.*RT.grid.dr;
-      dV = dA.*RT.grid.dz;
+      dV = RT.grid.dA.*RT.grid.dz;
       absorbed = RT.Adf + sum(RT.Adr_z.*RT.grid.dz);
       returned = [c.ka*sum(RT.phi_rz(:).*dV(:)), ...
          c.ka*sum(RT.phi_z.*RT.grid.dz)];
