@@ -1,6 +1,4 @@
-%==========================================================================
 function [ux,uy,uz] = chgdir(ux,uy,uz,us,phis)
-   %==========================================================================
    % Determines the new direction cosines (ux,uy,uz) from old direction
    % cosines (ux, uy, uz), polar scattering cosine (us), and
    % scattering azimuthal angle (phis). Robert A Leathers & Trijntje Downes,
@@ -22,7 +20,7 @@ function [ux,uy,uz] = chgdir(ux,uy,uz,us,phis)
       uz = s*us;
    else
       % if initial direction not straight up or straight down. The
-      % temporaries uxn and uyn keep uy from reading the updated ux (B).
+      % temporaries uxn and uyn keep uy from reading the updated ux.
       uxn = sintheta_s/sintheta*(ux*uz*cosphi_s-uy*sinphi_s) + ux*us;
       uyn = sintheta_s/sintheta*(uy*uz*cosphi_s+ux*sinphi_s) + uy*us;
       uz = -sintheta_s*sintheta*cosphi_s + uz*us;
@@ -39,7 +37,7 @@ function [ux,uy,uz] = chgdir(ux,uy,uz,us,phis)
    % mu_s = cosine of polar scattering angle (=cos(Psi)) (or cos(theta))
    % phi_s = azimuthal scattering angle (note, the angle (phi), not cos(phi))
 
-   % updated notation to ux/uy/uz/us in place of alpha/beta/gamma/gammas
-   % replaced matrix multiplication with explicit (faster) expressions for
-   % the updated ux, uy, uz and predefined cosphi_s/sinphi_s
+   % ux/uy/uz/us are alpha/beta/gamma/gammas in Leathers and Downes. The
+   % new ux, uy, uz are the rotation-matrix product written out as explicit
+   % expressions, which is faster, with cosphi_s/sinphi_s computed once.
 end

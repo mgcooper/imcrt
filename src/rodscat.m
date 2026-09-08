@@ -1,6 +1,4 @@
-%--------------------------------------------------------------------------
 function [x,y,z,mu_x,mu_y,mu_z] = rodscat(x,y,z,mu_x,mu_y,mu_z,l)
-   %--------------------------------------------------------------------------
    % RODSCAT scatters a "photon" at position x/y/z with ray trajectory mu_x/y/z
    % into a new trajectory with pathlength l. Scattering is isotropic.
    % Matt Cooper, guycooper@ucla.edu, Dec 2020
