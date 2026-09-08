@@ -128,51 +128,16 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
    dz = dz*ones(nz+1,1); % vertical bin widths, overflow included  [cm]
    dA = pi*(redge(2:end).^2-redge(1:end-1).^2);      % annulus area  [cm^2]
    dsr = 2*pi*(cos(aedge(1:end-1))-cos(aedge(2:end))); % solid angle [sr]
-   dV = dA.*dz;          % volume per (z, r) bin, nz+1 x nr+1      [cm^3]
-   cosa = cos(ai);
+   grid = struct('ri', ri, 'ai', ai, 'zi', zi, 'dr', dr, 'da', da, ...
+      'dz', dz, 'dA', dA, 'dsr', dsr);
 
-   % sum the 2-d arrays into 1-d and 0-d arrays (R=reflection, T=transmission)
-   Rdf_r = sum(Rdf_ra,1); % Eq. 4.3
-   Rdf_a = sum(Rdf_ra,2); % Eq. 4.4
-   Tdf_r = sum(Tdf_ra,1); % Eq. 4.5
-   Tdf_a = sum(Tdf_ra,2); % Eq. 4.6
-   Rdf = sum(Rdf_r);      % Eq. 4.7
-   Tdf = sum(Tdf_r);      % Eq. 4.8
-
-   % convert the photon counts to SI units
-   Rdf_ra = Rdf_ra./(dA.*dsr.*cosa.*N); % Eq. 4.9
-   Tdf_ra = Tdf_ra./(dA.*dsr.*cosa.*N); % Eq. 4.10
-   Rdf_r = Rdf_r./(dA.*N);              % Eq. 4.13
-   Tdf_r = Tdf_r./(dA.*N);              % Eq. 4.14
-   Rdf_a = Rdf_a./(dsr.*N);             % Eq. 4.15
-   Tdf_a = Tdf_a./(dsr.*N);             % Eq. 4.16
-   Rdr = Rdr/N;                         % + Rsp/N
-   Tdr = Tdr/N;
-   Rdf = Rdf/N; % Eq. 4.17
-   Tdf = Tdf/N; % Eq. 4.18
-   Tt = Tdf+Tdr;
-
-   % Absorption (Wang et al. 1995, Sect. 4). Adf_rz becomes a volume
-   % density; Adr_z and Adf_z become per unit depth, integrated over the
-   % plane. The direct beam is a pencil at r = 0, so its absorption is also
-   % a volume density in the first radial bin only (Adr_rz).
-   Adf_z = sum(Adf_rz,2);      % Eq. 4.20
-   Adf = sum(Adf_z);           % Eq. 4.22
-   Adf_rz = Adf_rz./dV./N;     % Eq. 4.23                       [1/cm^3]
-   Adr_rz = Adr_z./dV(:,1)./N; % direct pencil in radial bin 1  [1/cm^3]
-   Adr_z = Adr_z./dz./N;       % Eq. 4.24                       [1/cm]
-   Adf_z = Adf_z./dz./N;       % Eq. 4.25                       [1/cm]
-   Adf = Adf./N;               % Eq. 4.27                       [-]
-   % phi_rz    = Adf_rz./ka;                           % Eq. 4.28
-   % phi_z     = Adf_z./ka;                            % Eq. 4.29
-
-   % fluence per incident packet is total absorption over ka. Each sum adds
-   % like units: phi_rz from the two volume densities, phi_z from the two
-   % per-depth totals. ka times the volume integral of phi_rz returns
-   % Adf + Adr. ka times the depth integral of phi_z returns the same.
-   phi_rz = Adf_rz./ka;                    % Eq. 4.28           [1/cm^2]
-   phi_rz(:,1) = phi_rz(:,1)+Adr_rz./ka;   % Eq. 4.28, direct term
-   phi_z = (Adf_z+Adr_z)./ka;              % Eq. 4.29           [-]
+   % convert the photon counts to SI units (Wang et al. 1995, Sect. 4):
+   % scaleR and scaleT sum the resolved tallies and divide by the bin
+   % measures and N; scaleA does the same for absorption and forms the
+   % fluence. Rt is Rdf + Rdr, which the output does not carry.
+   [Rdf_ra,Rdf_r,Rdf_a,Rdf,Rdr,~] = scaleR(Rdf_ra,Rdr,grid,N);
+   [Tdf_ra,Tdf_r,Tdf_a,Tdf,Tdr,Tt] = scaleT(Tdf_ra,Tdr,grid,N);
+   [Adf_rz,Adf_z,Adf,Adr_z,phi_rz,phi_z] = scaleA(Adf_rz,Adr_z,ka,grid,N);
 
    % arrange the output
    RT.Rdf_ra = Rdf_ra;
@@ -196,13 +161,6 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
 
 
    % return the grid
-   RT.grid.ri = ri;
-   RT.grid.ai = ai;
-   RT.grid.zi = zi;
-   RT.grid.dr = dr;
-   RT.grid.da = da;
-   RT.grid.dz = dz;
-   RT.grid.dA = dA;
-   RT.grid.dsr = dsr;
+   RT.grid = grid;
 
 end

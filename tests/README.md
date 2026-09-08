@@ -129,6 +129,9 @@ caller's global random stream when the file finishes. `testSetup.m` covers
   written baseline reads back, and the overhead numbers are finite and
   positive. It is not in the fast suite because timing on a loaded laptop
   is not repeatable.
+- `testScale.m`: `scaleR`, `scaleT`, and `scaleA` normalize synthetic raw
+  tallies by measure and N, add direct to diffuse, and close the fluence
+  balance on a small grid.
 - `testBuildgrid.m`: grid lengths, orientation, optimized centers, and
   widths for integral inputs; current floor-based lengths for non-integral
   inputs (characterization until hardening, defect K).
