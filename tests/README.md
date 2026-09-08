@@ -85,8 +85,6 @@ caller's global random stream when the file finishes. `testSetup.m` covers
   dated PASS/FAIL report. Hemispherical rows get a 5e-4 absolute allowance
   and angular rows a 2% relative allowance for binning systematics. The
   report names any row that passed only by an allowance.
-- `verify/variancecheck.m`: run-to-run variance of Rd and Tt against the
-  binomial estimate; a ratio above 2 fails.
 - `verify/impactreport.m`: writes `docs/impact-report.md`: every shared
   case through the pre-fix kernel and each fix tag (extracted from git),
   with attribution per quantity, plus the retrospective against the
@@ -108,10 +106,15 @@ caller's global random stream when the file finishes. `testSetup.m` covers
   scratch git repository, not the live worktree.
 - `testImpact.m`: the attribution rule, the quantity summary, and the
   report generator at a tiny size.
+- `verify/verifyplot.m`: the figure of one run against its reference,
+  shown by `mcrt_verify` and saved as PNG by `vdhverify`.
+- `verify/variancecheck.m`: the run-to-run spread of Rd and Tt against
+  the per-run standard errors, a ratio that passes between 0.5 and 2.
 - `verify/reportname.m`: a dated report path that takes a numeric suffix
   when the name is taken, so no report is ever overwritten.
 - `testVdhverify.m`: the driver at scale 1e-3. It checks that the driver:
-  - creates the output folder and writes 36 checkpoints and a report;
+  - creates the output folder and writes 36 checkpoints, a report, and one
+    PNG figure per case;
   - resumes from the checkpoints and recomputes stale or unreadable ones;
   - keeps every report and reaches OVERALL FAIL with tmax = 0;
   - errors on an unwritable folder and closes the report after an error.
@@ -140,6 +143,10 @@ caller's global random stream when the file finishes. `testSetup.m` covers
   widths and edge-based measures for integral inputs; a fractional bin
   count is refused by name, whole counts with floating-point error give
   round(n) bins (K), and the plot option draws four axes.
+- `testInputValidation.m`: every bad mcrt argument raises `mcrt:input`
+  before the loop, a fractional Z/dz raises `buildgrid:nonintegral`, the
+  edge values g = -1, g = 1, ks = 0, and a one-bin slab run, and the
+  options wmin, wrr, R, dr, and da take effect or are refused by name.
 
 ## Performance
 

@@ -6,7 +6,8 @@ function reportfile = vdhverify(outdir, scale, tmax)
    %  Table 35) and case fluence (self-consistency) at the full sizes in
    %  verifycases, M independent seeded runs each. It saves every run to
    %  outdir/checkpoint_<case>_N<N>_seed<s>.mat as it completes and writes
-   %  outdir/vdh_report_<yyyyMMdd_HHmmss>.txt, whose path it returns.
+   %  outdir/vdh_report_<yyyyMMdd_HHmmss>.txt, whose path it returns, with
+   %  one PNG figure per case next to it (verifyplot).
    %
    %  A checkpoint holds the run's RT and a meta struct with:
    %    - the SHA-256 of every file in kernelfiles together (the kernel,
@@ -38,8 +39,9 @@ function reportfile = vdhverify(outdir, scale, tmax)
    %  interpolation between bin centers, which a 1e8-packet run resolves
    %  at several standard errors. The report names every row that passed
    %  only by an allowance. Tdr has no allowance. Rdr must be exactly zero
-   %  in every run. The run-to-run variance of Rd and Tt must be at most
-   %  twice the binomial estimate. The fluence case has no numeric
+   %  in every run. The run-to-run spread of Rd and Tt must lie between
+   %  half and twice the per-run standard error. The fluence case has no
+   %  numeric
    %  reference in this repository and reports self-consistency only.
    %  OVERALL is PASS when every row of both cases passes.
    if nargin < 2
@@ -61,6 +63,9 @@ function reportfile = vdhverify(outdir, scale, tmax)
    kernel = kernelhash(fullfile(root, kernelfiles()));
    reportfile = reportname(outdir, ...
       char(datetime('now', 'Format', 'yyyyMMdd_HHmmss')));
+   % The figures take the report's name with the case in place of
+   % 'report', so they sit next to it and never collide either.
+   [~, reportbase] = fileparts(reportfile);
    fid = fopen(reportfile, 'w');
    if fid < 0
       error('vdhverify:report', 'Cannot open %s', reportfile);
@@ -87,7 +92,15 @@ function reportfile = vdhverify(outdir, scale, tmax)
       fprintf(fid, '== case %s: M=%d runs, N=%d, seeds %d:%d, tmax %g\n', ...
          c.name, f.M, N, f.seeds(1), f.seeds(end), f.tmax);
       [RTs, tcase, trecorded] = runcheckpointed(c, f, N, outdir, kernel, fid);
-      [npass, nrow] = reportcase(RTs, c, N, f.tmax, fid);
+      [npass, nrow] = reportcase(RTs, c, f.tmax, fid);
+      % One figure per case, drawn from the first run and saved as PNG.
+      fig = verifyplot(RTs{1}, c.name);
+      figfile = fullfile(outdir, ...
+         [strrep(reportbase, 'report', c.name) '.png']);
+      set(fig, 'Color', 'w'); % a headless figure saves with a black surround
+      saveas(fig, figfile);
+      close(fig);
+      fprintf(fid, 'figure: %s\n', figfile);
       fprintf(fid, 'case %s: %d/%d pass; %.0f s new, %.0f s all\n\n', ...
          c.name, npass, nrow, tcase, trecorded);
       overall = overall && npass == nrow;
@@ -206,7 +219,7 @@ function [RTs, tnew, tall] = runcheckpointed(c, f, N, outdir, kernel, fid)
    end
 end
 
-function [npass, nrow] = reportcase(RTs, c, N, tmax, fid)
+function [npass, nrow] = reportcase(RTs, c, tmax, fid)
    % Print the verdict of one case to the report and return the pass and
    % row counts. reflect adds the variance check; fluence has none.
    abstol = 5e-4;
@@ -214,7 +227,7 @@ function [npass, nrow] = reportcase(RTs, c, N, tmax, fid)
    switch c.name
       case 'reflect'
          V = vdhverdict(RTs, vdhtable35(), tmax, abstol, reltol);
-         W = variancecheck(RTs, N);
+         W = variancecheck(RTs);
       case 'fluence'
          V = fluenceverdict(RTs, c, tmax);
          W = [];

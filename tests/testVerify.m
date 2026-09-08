@@ -148,18 +148,26 @@ function testFluenceVerdictRules(testCase)
 end
 
 function testVarianceCheckThreshold(testCase)
-   % Synthetic runs with a known spread: a ratio at or below 2 passes and
-   % a ratio above 2 fails, for Rd and Tt independently.
-   N = 1e4;
+   % Synthetic runs with a known spread and known per-run errors: a ratio
+   % of spread to error inside [0.5, 2] passes, and ratios above 2 and
+   % below 0.5 fail, for Rd and Tt independently.
    p = 0.1;
-   sigma = sqrt(p*(1 - p)/N);
+   sigma = 1e-3;
    RTs = cell(1, 4);
    for n = 1:4
-      RTs{n} = struct('Rdf', p + sigma*(n - 2.5), 'Tt', p + 3*sigma*(n - 2.5));
+      RTs{n} = struct('Rdf', p + sigma*(n - 2.5), ...
+         'Tt', p + 3*sigma*(n - 2.5), 'se', struct('Rdf', sigma, 'Tt', sigma));
    end
-   W = variancecheck(RTs, N);
-   returned = {W.verdict{1}, W.verdict{2}, W.model(1) <= 2, W.model(2) > 2};
-   expected = {'PASS', 'FAIL', true, true};
+   W = variancecheck(RTs);
+   returned = {W.verdict{1}, W.verdict{2}, W.model(1), W.model(2) > 2};
+   expected = {'PASS', 'FAIL', std([-1.5 -0.5 0.5 1.5]), true};
+   testCase.verifyEqual(returned, expected, 'AbsTol', 1e-12);
+   for n = 1:4
+      RTs{n}.se.Rdf = 10*sigma;
+   end
+   W = variancecheck(RTs);
+   returned = {W.verdict{1}, W.model(1) < 0.5};
+   expected = {'FAIL', true};
    testCase.verifyEqual(returned, expected);
 end
 

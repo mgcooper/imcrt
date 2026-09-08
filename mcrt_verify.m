@@ -52,39 +52,5 @@ function [V, RTs] = mcrt_verify(casename)
       'tmax=%g)\n'], casename, overall, npass, nrow, c.M, c.N, c.tmax);
 
    % Plots: angular tables against the reference, or fluence against depth.
-   RT = RTs{1};
-   switch casename
-
-      case 'reflect'
-
-         ref = vdhtable35();
-
-         figure('Units', 'in', 'Position', [3 3 12 5]);
-         subplot(1, 2, 1);
-         hold on
-         box on
-         scatter(RT.grid.ai/pi, RT.Rdf_a, 80, 'filled', 's');
-         scatter(acos(ref.mu)/pi, ref.R_sr, 80, 'filled');
-         xlabel('exiting angle, \alpha [\pi rad]', 'Interpreter', 'tex');
-         ylabel('R_d(\alpha) [sr^{-1}]', 'Interpreter', 'tex');
-         legend('iMCRT', 'van de Hulst');
-
-         subplot(1, 2, 2);
-         hold on
-         box on
-         scatter(RT.grid.ai/pi, RT.Tdf_a, 80, 'filled', 's');
-         scatter(acos(ref.mu)/pi, ref.T_sr, 80, 'filled');
-         xlabel('exiting angle, \alpha [\pi rad]', 'Interpreter', 'tex');
-         ylabel('T_d(\alpha) [sr^{-1}]', 'Interpreter', 'tex');
-         legend('iMCRT', 'van de Hulst');
-
-      case 'fluence'
-
-         % see Fig. 4 in Wang et al. 1995 for comparison
-         figure;
-         scatter(RT.grid.zi, RT.phi_z);
-         set(gca, 'YScale', 'log', 'YLim', [0.5 10], 'XLim', [0 1]);
-         xlabel('z (cm)');
-         ylabel('Fluence (-)');
-   end
+   verifyplot(RTs{1}, casename);
 end
