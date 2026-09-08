@@ -1,9 +1,7 @@
 function tests = testBuildgrid
    % Unit tests for buildgrid: grid vector lengths, orientation, optimized
-   % center coordinates, and bin widths for integral R/dr, A/da, and Z/dz.
-   % The non-integral test records current behavior only. Bead .15 (defect
-   % K) decides whether buildgrid rejects non-integral inputs or matches the
-   % kernel's round(), and updates that test.
+   % center coordinates, and bin widths for integral R/dr, A/da, and Z/dz,
+   % and the rejection of a fractional bin count (defect K).
    tests = functiontests(localfunctions);
 end
 
@@ -60,20 +58,57 @@ function testWidthsFollowCenters(testCase)
    testCase.verifyEqual(returned, expected, 'RelTol', 1e-12);
 end
 
-function testNonIntegralLengthsCurrentBehavior(testCase)
-   % Characterization of current behavior. With R/dr = Z/dz = 2.5 and A/da = 3.5
-   % the colon operator yields floor(n) centers, while mcrt sizes its tallies
-   % with round(n) (defect K). The two disagree at .5 and above.
+function testFractionalCountsAreRejected(testCase)
+   % With R/dr = Z/dz = 2.5 and A/da = 3.5 the colon operator would build
+   % floor(n) centers while mcrt sizes its tallies with round(n), so
+   % buildgrid refuses each fractional count by name.
    R = 0.025;
    A = pi/2;
    Z = 0.025;
    dr = 0.01;
    da = pi/7;
    dz = 0.01;
-   [ri, ai, zi] = buildgrid(R, A, Z, dr, da, dz);
-   returned = {numel(ri), numel(ai), numel(zi)};
-   expected = {floor(R/dr) + 1, floor(A/da), floor(Z/dz) + 1};
-   testCase.verifyEqual(returned, expected);
-   returned = {round(R/dr) + 1, round(A/da), round(Z/dz) + 1};
-   testCase.verifyNotEqual(returned, expected);
+   testCase.verifyError(@() buildgrid(R, A, 0.02, dr, pi/6, 0.01), ...
+      'buildgrid:nonintegral');
+   testCase.verifyError(@() buildgrid(0.02, A, 0.02, dr, da, 0.01), ...
+      'buildgrid:nonintegral');
+   testCase.verifyError(@() buildgrid(0.02, A, Z, dr, pi/6, dz), ...
+      'buildgrid:nonintegral');
+   % An extent below one bin is a fractional count too, and a ratio that
+   % rounds to zero within the tolerance fails the one-or-more bound.
+   testCase.verifyError(@() buildgrid(0.02, A, 0.005, dr, pi/6, 0.01), ...
+      'buildgrid:nonintegral');
+   testCase.verifyError(@() buildgrid(0.02, A, 1e-12, dr, pi/6, 1), ...
+      'buildgrid:nonintegral');
+   % A width whose half underflows cannot start a grid.
+   testCase.verifyError(@() buildgrid(0.02, A, eps(0), dr, pi/6, eps(0)), ...
+      'buildgrid:width');
+end
+
+function testWholeCountsWithRoundoff(testCase)
+   % Ratios that are whole on paper but not in floating point, such as
+   % 0.02/0.001 and 0.1/0.005, and a ratio 1e-10 relative below a whole
+   % number, pass the check and give round(n) bins, the sizes mcrt uses
+   % for its tallies.
+   [ri, ~, zi] = buildgrid(2, pi/2, 0.02, 0.001, pi/60, 0.001);
+   [ri2, ~, zi2] = buildgrid(0.1, pi/2, 0.1, 0.005, pi/60, 0.005);
+   [~, ~, zi3] = buildgrid(0.1, pi/2, 20*(1 - 1e-10), 0.005, pi/60, 1);
+   % one bin a rounding error short: the colon is empty and the center
+   % is built directly
+   [~, ~, zi4] = buildgrid(0.1, pi/2, 1 - 1e-10, 0.005, pi/60, 1);
+   returned = {numel(ri), numel(zi), numel(ri2), numel(zi2), numel(zi3), ...
+      zi4};
+   expected = {2001, 21, 21, 21, 21, [0.5; 1.5]};
+   testCase.verifyEqual(returned, expected, 'AbsTol', 1e-15);
+end
+
+function testOneAngularBin(testCase)
+   % A single angular bin (A = da) is allowed: its center is the shifted
+   % half-width and its width is the input width, since derivative needs
+   % two points.
+   [~, ai, ~, ~, da] = buildgrid(0.02, pi/2, 0.02, 0.001, pi/2, 0.001);
+   ac = pi/4;
+   returned = {numel(ai), ai, da};
+   expected = {1, ac + cot(ac)*(1 - pi/4*cot(pi/4)), pi/2};
+   testCase.verifyEqual(returned, expected, 'AbsTol', 1e-15);
 end

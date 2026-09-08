@@ -7,6 +7,24 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
    %  absorption (A), and fluence (phi) tallies, diffuse (df) and direct
    %  (dr), resolved by radius (r), angle (a), and depth (z) on a grid with
    %  vertical spacing dz, plus that grid and its bin measures in RT.grid.
+   %
+   %  ka is a finite positive scalar (the fluence is absorption over ka)
+   %  and ks a finite nonnegative one, with a finite sum; g lies in
+   %  [-1, 1], where -1 reverses and 1 keeps every direction; Z and dz are
+   %  positive and Z/dz is a whole number; N is a positive integer. All
+   %  are double scalars. A bad input raises mcrt:input, or
+   %  buildgrid:nonintegral for Z/dz and buildgrid:width for a dz whose
+   %  half underflows, before any packet runs.
+
+   % every input is checked once, before the loop: a bad value would
+   % otherwise surface as an index error or a silent NaN deep inside
+   mustbe(isnumber(ka) && ka > 0, 'ka', 'a finite positive scalar');
+   mustbe(isnumber(ks) && ks >= 0, 'ks', 'a finite nonnegative scalar');
+   mustbe(isfinite(ka + ks), 'ka + ks', 'finite');
+   mustbe(isnumber(g) && g >= -1 && g <= 1, 'g', 'a scalar in [-1, 1]');
+   mustbe(isnumber(Z) && Z > 0, 'Z', 'a finite positive scalar');
+   mustbe(isnumber(dz) && dz > 0, 'dz', 'a finite positive scalar');
+   mustbe(isnumber(N) && N >= 1 && N == fix(N), 'N', 'a positive integer');
 
    % optical coefficients
    w = ks/(ka+ks); % single-scattering albedo          [-]
@@ -27,6 +45,25 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
    nr = round(R/dr); % radial
    na = round(A/da); % angular
    nz = round(Z/dz); % vertical
+
+   % build a grid to calculate observable quantities (eq. 4.1/4.2 Wang),
+   % before the loop so a fractional Z/dz fails before any packet runs.
+   % buildgrid's shifted centers are reporting coordinates (Eqs. 8 and 14
+   % of the paper it cites), not bin measures, so the measures come from
+   % the bin edges instead. Each overflow bin takes one more bin width.
+   % The tallies are sized with round(); buildgrid checked that every
+   % count is whole, so the grid must have exactly those bins.
+   [ri,ai,zi] = buildgrid(R,A,Z,dr,da,dz);
+   assert(numel(ri) == nr+1 && numel(ai) == na && numel(zi) == nz+1, ...
+      'mcrt:grid', 'grid lengths differ from the tally sizes');
+   redge = (0:nr+1)*dr;  % radial bin edges, overflow included     [cm]
+   aedge = (0:na)'*da;   % angular bin edges                       [rad]
+   grid = struct('ri', ri, 'ai', ai, 'zi', zi, ...
+      'dr', dr*ones(1,nr+1), ... % radial bin widths                [cm]
+      'da', da*ones(na,1), ...   % angular bin widths               [rad]
+      'dz', dz*ones(nz+1,1), ... % vertical bin widths, overflow    [cm]
+      'dA', pi*(redge(2:end).^2-redge(1:end-1).^2), ... % annulus   [cm^2]
+      'dsr', 2*pi*(cos(aedge(1:end-1))-cos(aedge(2:end)))); % sr
 
    % initialize output grids with +1 for overflow
    Adf_rz = zeros(nz+1,nr+1); % absorption, diffuse
@@ -115,21 +152,6 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
       end
    end
 
-   % build a grid to calculate observable quantities (eq. 4.1/4.2 Wang).
-   % buildgrid's shifted centers are reporting coordinates (Eqs. 8 and 14
-   % of the paper it cites), not bin measures, so the measures below come
-   % from the bin edges instead (defect S). Each overflow bin takes one more
-   % bin width.
-   [ri,ai,zi] = buildgrid(R,A,Z,dr,da,dz);
-   redge = (0:nr+1)*dr;  % radial bin edges, overflow included     [cm]
-   aedge = (0:na)'*da;   % angular bin edges                       [rad]
-   dr = dr*ones(1,nr+1); % radial bin widths                       [cm]
-   da = da*ones(na,1);   % angular bin widths                      [rad]
-   dz = dz*ones(nz+1,1); % vertical bin widths, overflow included  [cm]
-   dA = pi*(redge(2:end).^2-redge(1:end-1).^2);      % annulus area  [cm^2]
-   dsr = 2*pi*(cos(aedge(1:end-1))-cos(aedge(2:end))); % solid angle [sr]
-   grid = struct('ri', ri, 'ai', ai, 'zi', zi, 'dr', dr, 'da', da, ...
-      'dz', dz, 'dA', dA, 'dsr', dsr);
 
    % convert the photon counts to SI units (Wang et al. 1995, Sect. 4):
    % scaleR and scaleT sum the resolved tallies and divide by the bin
@@ -163,4 +185,16 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
    % return the grid
    RT.grid = grid;
 
+end
+
+function tf = isnumber(x)
+   % A finite real double scalar. Integer classes are refused because
+   % their arithmetic saturates; single is refused because buildgrid's
+   % whole-bin tolerance is set for double precision.
+   tf = isa(x, 'double') && isscalar(x) && isreal(x) && isfinite(x);
+end
+
+function mustbe(cond, name, what)
+   % Raise mcrt:input naming the argument when its check fails.
+   assert(cond, 'mcrt:input', '%s must be %s', name, what);
 end

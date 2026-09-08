@@ -133,8 +133,11 @@ caller's global random stream when the file finishes. `testSetup.m` covers
   tallies by measure and N, add direct to diffuse, and close the fluence
   balance on a small grid.
 - `testBuildgrid.m`: grid lengths, orientation, optimized centers, and
-  widths for integral inputs; current floor-based lengths for non-integral
-  inputs (characterization until hardening, defect K).
+  widths for integral inputs; a fractional bin count is refused by name,
+  and whole counts with floating-point error give round(n) bins (K).
+- `testInputValidation.m`: every bad mcrt argument raises `mcrt:input`
+  before the loop, a fractional Z/dz raises `buildgrid:nonintegral`, and
+  the edge values g = -1, g = 1, ks = 0, and a one-bin slab run.
 
 ## Performance
 
