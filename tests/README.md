@@ -65,7 +65,7 @@ caller's global random stream when the file finishes. `testSetup.m` covers
 - `verify/vdhtable35.m`: van de Hulst Table 35 references and case
   parameters, the one source for the tests and `mcrt_verify.m`.
 - `testVerify.m`: the verification layer: case table, van de Hulst and
-  fluence verdict tables, and `mcrt_verify.m` running standalone for each
+  fluence verdict tables, and `mcrt_verify` running for each
   case at its interactive size.
 - `verify/verifycases.m`: the cases `mcrt_verify.m` runs, with kernel
   inputs, run count, packets, seeds, and the t cutoff.

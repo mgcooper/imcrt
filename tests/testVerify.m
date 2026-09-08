@@ -1,14 +1,17 @@
 function tests = testVerify
    % Tests for the verification layer: the case table, the van de Hulst
    % and fluence verdicts with passing and failing inputs, and the printer.
-   % mcrt_verify.m must also run standalone for every case.
+   % mcrt_verify must also run for every case and default to reflect.
    tests = functiontests(localfunctions);
 end
 
 function setupOnce(testCase)
-   % The fixture adds src and tests/verify. Figures the script opens are
-   % closed afterward so headless runs leave nothing behind.
+   % The fixture adds src and tests/verify, and the repo root holds
+   % mcrt_verify. Figures the function opens are closed afterward so
+   % headless runs leave nothing behind.
    kernelfixture(testCase);
+   testCase.applyFixture(matlab.unittest.fixtures.PathFixture( ...
+      fileparts(fileparts(mfilename('fullpath')))));
    testCase.addTeardown(@() close('all'));
 end
 
@@ -166,24 +169,23 @@ function testPrintVerdictCountsPasses(testCase)
    testCase.verifyEqual(returned, expected);
 end
 
-function testScriptRunsEachCase(testCase)
-   % mcrt_verify.m honors a preset casename, runs at its interactive size,
-   % and prints a passing VERDICT line for both cases. The runner makes
-   % tests/ the current folder, so the script runs by path. The script
-   % leaves c in this workspace, which proves it read casename.
-   script = fullfile(fileparts(fileparts(mfilename('fullpath'))), ...
-      'mcrt_verify.m');
-   command = ['run(''' script ''')'];
-   casename = 'reflect';
-   out = evalc(command);
-   returned = {contains(out, 'VERDICT reflect: PASS'), c.name};
-   expected = {true, casename};
+function testFunctionRunsEachCase(testCase)
+   % mcrt_verify runs each case at its interactive size, prints a passing
+   % VERDICT line, and returns a verdict table with every row PASS and
+   % the M runs. With no argument it runs reflect.
+   [out, V, RTs] = evalc('mcrt_verify(''reflect'')');
+   returned = {contains(out, 'VERDICT reflect: PASS'), ...
+      all(strcmp(V.verdict, 'PASS')), numel(RTs)};
+   expected = {true, true, verifycases('reflect').M};
    testCase.verifyEqual(returned, expected, out(max(1, end-300):end));
-   casename = 'fluence';
-   out = evalc(command);
-   returned = {contains(out, 'VERDICT fluence: PASS'), c.name};
-   expected = {true, casename};
+   [out, V, RTs] = evalc('mcrt_verify(''fluence'')');
+   returned = {contains(out, 'VERDICT fluence: PASS'), ...
+      all(strcmp(V.verdict, 'PASS')), numel(RTs)};
+   expected = {true, true, verifycases('fluence').M};
    testCase.verifyEqual(returned, expected, out(max(1, end-300):end));
+   out = evalc('mcrt_verify()');
+   testCase.verifyTrue(contains(out, 'VERDICT reflect: PASS'), ...
+      out(max(1, end-300):end));
 end
 
 function RTs = runcase(c, M, N, seeds)
