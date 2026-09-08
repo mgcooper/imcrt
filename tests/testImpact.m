@@ -88,29 +88,19 @@ function testRelativeChangeText(testCase)
 end
 
 function testSourceMatchesScratchRepository(testCase)
-   % A scratch repository holds the three checked files at a tag. The
-   % check reports the tag match and a clean tree, still reports clean
-   % when the worktree copy only changes LF to CRLF, reports dirty after
-   % a content edit, and reports a tree mismatch once that edit is
-   % committed. A scratch repository keeps the suite independent of the
-   % live worktree, which may hold legitimate uncommitted edits.
+   % A scratch repository holds every kernel file at a tag. The check
+   % reports the tag match and a clean tree, still reports clean when the
+   % worktree copy only changes LF to CRLF, reports dirty after a content
+   % edit, reports a tree mismatch once that edit is committed, and
+   % reports dirty when HEAD stops holding a file the worktree has. A
+   % scratch repository keeps the suite independent of the live worktree,
+   % which may hold legitimate uncommitted edits.
    % Assign the fixture first: R2020b cannot dot-index a call result.
    fixture = testCase.applyFixture( ...
       matlab.unittest.fixtures.TemporaryFolderFixture);
    folder = fixture.Folder;
-   git = @(args) system(sprintf( ...
-      ['git -C "%s" -c user.name=t -c user.email=t@t ' ...
-      '-c commit.gpgsign=false --no-pager %s'], folder, args));
-   mkdir(fullfile(folder, 'src', 'derivative'));
-   files = {fullfile('src', 'mcrt.m'), fullfile('src', 'buildgrid.m'), ...
-      fullfile('src', 'derivative', 'derivative.m')};
-   for n = 1:numel(files)
-      writetext(fullfile(folder, files{n}), ...
-         sprintf('function x = f\n   x = 1;\nend\n'));
-   end
-   status = [git('init -q'), git('add -A'), git('commit -q -m base'), ...
-      git('tag t1')];
-   testCase.assertEqual(status, zeros(1, 4), 'git setup failed');
+   files = kernelfiles();
+   git = scratchrepo(folder, files, 't1');
    [same1, clean1] = srcmatches(folder, 't1');
    % LF to CRLF only: the clean check normalizes line endings.
    writetext(fullfile(folder, files{1}), ...
@@ -123,8 +113,54 @@ function testSourceMatchesScratchRepository(testCase)
    status = [git('add -A'), git('commit -q -m edit')];
    testCase.assertEqual(status, zeros(1, 2), 'git commit failed');
    [same4, clean4] = srcmatches(folder, 't1');
-   returned = {same1, clean1, same2, clean2, same3, clean3, same4, clean4};
-   expected = {true, true, true, true, true, false, false, true};
+   % A helper the worktree has but HEAD does not: dirty, not an error.
+   status = [git(sprintf('rm -q --cached "%s"', files{end})), ...
+      git('commit -q -m drop')];
+   testCase.assertEqual(status, zeros(1, 2), 'git drop failed');
+   [same5, clean5] = srcmatches(folder, 't1');
+   returned = {same1, clean1, same2, clean2, same3, clean3, same4, clean4, ...
+      same5, clean5};
+   expected = {true, true, true, true, true, false, false, true, ...
+      false, false};
+   testCase.verifyEqual(returned, expected);
+end
+
+function testExtractFilesFailurePaths(testCase)
+   % extractfiles refuses a ref that does not resolve, refuses a valid ref
+   % that lacks the kernel, and skips a helper the ref predates while
+   % extracting what the ref holds.
+   fixture = testCase.applyFixture( ...
+      matlab.unittest.fixtures.TemporaryFolderFixture);
+   repo = fullfile(fixture.Folder, 'repo');
+   scratch = fullfile(fixture.Folder, 'scratch');
+   mkdir(repo);
+   mkdir(scratch);
+   files = kernelfiles();
+   % Only the grid builder is committed: no kernel at the tag.
+   scratchrepo(repo, files(strcmp(files, 'src/buildgrid.m')), 'nokernel');
+   testCase.verifyError(@() extractfiles(repo, scratch, 'nosuchref', ...
+      'a', files), 'extractfiles:ref');
+   testCase.verifyError(@() extractfiles(repo, scratch, 'nokernel', ...
+      'b', files), 'extractfiles:git');
+   % The kernel and the builder exist; the helpers do not, as at an old ref.
+   git = scratchrepo(repo, files(strcmp(files, 'src/mcrt.m')), 'old');
+   testCase.assertEqual(git('rev-parse --verify old'), 0);
+   folder = extractfiles(repo, scratch, 'old', 'c', files);
+   listing = dir(fullfile(folder, '*.m'));
+   returned = sort({listing.name});
+   expected = {'buildgrid.m', 'mcrt.m'};
+   testCase.verifyEqual(returned, expected);
+   % The same name serves the same ref again and refuses another ref; a
+   % folder left by a failed extraction (no marker) is redone.
+   again = extractfiles(repo, scratch, 'old', 'c', files);
+   testCase.verifyEqual(again, folder);
+   testCase.verifyError(@() extractfiles(repo, scratch, 'nokernel', 'c', ...
+      files), 'extractfiles:cache');
+   delete(fullfile(folder, 'extracted.ref'));
+   delete(fullfile(folder, 'buildgrid.m'));
+   extractfiles(repo, scratch, 'old', 'c', files);
+   returned = exist(fullfile(folder, 'buildgrid.m'), 'file');
+   expected = 2;
    testCase.verifyEqual(returned, expected);
 end
 
@@ -168,4 +204,28 @@ function writetext(path, text)
    fid = fopen(path, 'w');
    fprintf(fid, '%s', text);
    fclose(fid);
+end
+
+function git = scratchrepo(folder, files, tag)
+   % Initialize (or reuse) a git repository in folder, write one-line
+   % functions at the given repository-relative paths, commit, and tag.
+   % Returns a handle that runs git in that repository with a throwaway
+   % identity and without signing or paging.
+   git = @(args) system(sprintf( ...
+      ['git -C "%s" -c user.name=t -c user.email=t@t ' ...
+      '-c commit.gpgsign=false --no-pager %s'], folder, args));
+   if ~exist(fullfile(folder, '.git'), 'dir')
+      assert(git('init -q') == 0, 'git init failed');
+   end
+   for n = 1:numel(files)
+      target = fullfile(folder, files{n});
+      [parent, ~] = fileparts(target);
+      if ~exist(parent, 'dir')
+         mkdir(parent);
+      end
+      writetext(target, sprintf('function x = f\n   x = 1;\nend\n'));
+   end
+   status = [git('add -A'), git(sprintf('commit -q -m %s', tag)), ...
+      git(sprintf('tag %s', tag))];
+   assert(all(status == 0), 'git commit or tag failed');
 end

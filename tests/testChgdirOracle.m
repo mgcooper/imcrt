@@ -1,10 +1,8 @@
 function tests = testChgdirOracle
-   % Tests for the direction-cosine update (defect B) in src/chgdir.m and in
-   % the inline copy inside the src/mcrt.m photon loop. The update must keep
-   % the unit norm and deflect by exactly the sampled cosine. It must spread
-   % azimuths uniformly per the RotationMatrix oracle and agree between the
-   % two copies. The inline copy is read from the source between its marker
-   % comments and evaluated, so the hot loop keeps no function call.
+   % Tests for the direction-cosine update (defect B) in src/chgdir.m, which
+   % the src/mcrt.m photon loop calls. The update must keep the unit norm
+   % and deflect by exactly the sampled cosine. It must spread azimuths
+   % uniformly per the RotationMatrix oracle.
    tests = functiontests(localfunctions);
 end
 
@@ -69,44 +67,4 @@ function testAzimuthUniformVsOracle(testCase)
    returned = abs(diff(unwrap(atan2(local(2, :), local(1, :)))));
    expected = 2*pi/K*ones(1, K-1);
    testCase.verifyEqual(returned, expected, 'AbsTol', 1e-9);
-end
-
-function testInlineBlockMatchesChgdir(testCase)
-   % The kernel keeps an inline copy of chgdir for speed. Evaluate that
-   % copy, read from src/mcrt.m between its marker comments, together with
-   % the kernel's Henyey-Greenstein sampler. Check it against chgdir on the
-   % same draws. Check that one scatter leaves weight w and count 1. Also
-   % check the sampler's first moment, which is g.
-   precompute = kernellines('% henyey-greenstein terms', '');
-   scatter = kernellines('% absorption and scattering by ice', ...
-      '% russian roulette');
-   g = 0.75;
-   w = 0.9;
-   eval(precompute);
-   rng(12, 'twister');
-   ndraw = 2e4;
-   u = randn(3, ndraw);
-   u = u ./ sqrt(sum(u.^2, 1));
-   u(:, 1) = [0; 0; 1];
-   u(:, 2) = [0; 0; -1];
-   returned = zeros(6, ndraw);
-   expected = zeros(6, ndraw);
-   for n = 1:ndraw
-      ux = u(1, n);
-      uy = u(2, n);
-      uz = u(3, n);
-      wt = 1;
-      ns = 0;
-      eval(scatter);
-      [cx, cy, cz] = chgdir(u(1, n), u(2, n), u(3, n), us, ps);
-      returned(:, n) = [ux; uy; uz; ux*u(1, n) + uy*u(2, n) + uz*u(3, n); ...
-         wt; ns];
-      expected(:, n) = [cx; cy; cz; us; w; 1];
-   end
-   testCase.verifyEqual(returned, expected, 'AbsTol', 1e-12);
-   % Five standard errors of the sample mean bound the first moment.
-   tol = 5*std(expected(4, :))/sqrt(ndraw);
-   returned = mean(expected(4, :));
-   expected = g;
-   testCase.verifyEqual(returned, expected, 'AbsTol', tol);
 end

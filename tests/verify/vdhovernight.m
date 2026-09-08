@@ -9,8 +9,9 @@ function reportfile = vdhovernight(outdir, scale, tmax)
    %  outdir/vdh_report_<yyyyMMdd_HHmmss>.txt, whose path it returns.
    %
    %  A checkpoint holds the run's RT and a meta struct with:
-   %    - the SHA-256 of src/mcrt.m, src/buildgrid.m, and
-   %      src/derivative/derivative.m together (every file that shapes a
+   %    - the SHA-256 of every file in kernelfiles together (the kernel,
+   %      the functions its loop calls, the grid builder, and the
+   %      derivative; every file that shapes a
    %      result);
    %    - the MATLAB version;
    %    - the kernel inputs [ka ks g Z dz N seed];
@@ -57,9 +58,7 @@ function reportfile = vdhovernight(outdir, scale, tmax)
    run(fullfile(root, 'Setup.m'));
    addpath(fullfile(root, 'tests', 'verify'));
 
-   kernel = kernelhash({fullfile(root, 'src', 'mcrt.m'), ...
-      fullfile(root, 'src', 'buildgrid.m'), ...
-      fullfile(root, 'src', 'derivative', 'derivative.m')});
+   kernel = kernelhash(fullfile(root, kernelfiles()));
    reportfile = reportname(outdir, ...
       char(datetime('now', 'Format', 'yyyyMMdd_HHmmss')));
    fid = fopen(reportfile, 'w');
@@ -71,7 +70,8 @@ function reportfile = vdhovernight(outdir, scale, tmax)
    cleaner = onCleanup(@() closeifopen(fid));
    fprintf(fid, 'imcrt overnight verification, %s\nMATLAB %s\n', ...
       char(datetime('now')), version);
-   fprintf(fid, 'kernel mcrt+buildgrid+derivative sha256 %s\n', kernel);
+   fprintf(fid, 'kernel sha256 %s of %s\n', kernel, ...
+      strjoin(kernelfiles(), '+'));
    fprintf(fid, 'scale %g (every N multiplied by scale)\n\n', scale);
    overall = true;
    tnew = 0;

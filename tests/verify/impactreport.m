@@ -92,8 +92,9 @@ function reportfile = impactreport(varargin)
       'depth 10. Its lengths are scaled to the kernel''s 2 cm radial ' ...
       'grid. The paper''s rod geometry is not part of src/mcrt.m.\n\n'], ...
       refs{1, 1}, strjoin(refs(2:end, 1)', ', '));
-   kernelfiles = {'src/mcrt.m', 'src/buildgrid.m', ...
-      'src/derivative/derivative.m'};
+   % A helper that a ref predates (its code was inline then) is skipped by
+   % extractfiles, so one list serves every ref.
+   kfiles = kernelfiles();
    cases = [mcrtcases(), struct('name', 'paper_radial', 'ka', 0.01, ...
       'ks', 9.99, 'g', 0.9, 'Z', 1, 'dz', 0.05, 'N', N, 'seed', 45)];
    for k = 1:numel(cases)
@@ -101,7 +102,7 @@ function reportfile = impactreport(varargin)
       values = zeros(nq, size(refs, 1));
       for v = 1:size(refs, 1)
          kernel = extractfiles(root, scratch, refs{v, 1}, refs{v, 1}, ...
-            kernelfiles);
+            kfiles);
          RT = runwith(kernel, c, N);
          [names, values(:, v), notes] = impactquantities(RT);
       end
@@ -130,7 +131,7 @@ function reportfile = impactreport(varargin)
    frozen = extractfiles(root, scratch, refs{1, 1}, 'c2021', ...
       {[c2021 'mcrt_verify.m'], [c2021 'func/main/chgdir.m'], ...
       [c2021 'func/util/mcrt_build_grid.m']});
-   pinned = extractfiles(root, scratch, refs{1, 1}, refs{1, 1}, kernelfiles);
+   pinned = extractfiles(root, scratch, refs{1, 1}, refs{1, 1}, kfiles);
    script = scratch2021(frozen, scratch, 'script');
    scriptp = scratch2021(frozen, scratch, 'production');
    seeds = 100 + (1:M);
@@ -252,29 +253,6 @@ function reportfile = impactreport(varargin)
    clear closer
 end
 
-function folder = extractfiles(root, scratch, ref, name, files)
-   % Folder scratch/name holding the named repository files as of ref,
-   % by base name, extracted once per name with git show. Historical
-   % kernels come out this way so a historical buildgrid never resolves
-   % the worktree derivative, and the frozen 2021 script and its helpers
-   % come out this way so an uncommitted edit under the frozen example
-   % cannot pass as the 2021 kernel. --no-pager keeps git from waiting on
-   % the pseudo-terminal that MATLAB's system attaches.
-   folder = fullfile(scratch, name);
-   if exist(folder, 'dir')
-      return
-   end
-   mkdir(folder);
-   for n = 1:numel(files)
-      [~, base, ext] = fileparts(files{n});
-      [status, out] = system(sprintf( ...
-         'git -C "%s" --no-pager show %s:%s > "%s"', ...
-         root, ref, files{n}, fullfile(folder, [base ext])));
-      assert(status == 0, 'impactreport:git', 'git show %s:%s failed: %s', ...
-         ref, files{n}, out);
-   end
-end
-
 function RT = runwith(kernel, c, N)
    % Run one case with the kernel folder at the front of the path, then
    % take it off again, also on error or interrupt, so no historical
@@ -282,7 +260,10 @@ function RT = runwith(kernel, c, N)
    % version's files are the ones that run.
    addpath(kernel);
    restore = onCleanup(@() dropkernel(kernel));
-   clear mcrt buildgrid derivative
+   clear mcrt buildgrid derivative chgdir hgcos roulette binindex
+   % The extracted kernel must be the one that runs, not the worktree's.
+   assert(startsWith(which('mcrt'), kernel), 'impactreport:path', ...
+      'mcrt resolves outside %s', kernel);
    rng(c.seed, 'twister');
    RT = mcrt(c.ka, c.ks, c.g, c.Z, c.dz, N);
    clear restore
@@ -292,7 +273,8 @@ function dropkernel(folder)
    % Take a kernel or helper folder off the path and drop the cached
    % functions it provided.
    rmpath(folder);
-   clear mcrt buildgrid derivative chgdir mcrt_build_grid
+   clear mcrt buildgrid derivative chgdir hgcos roulette binindex ...
+      mcrt_build_grid
 end
 
 function script = scratch2021(frozen, scratch, stream)

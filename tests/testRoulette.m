@@ -1,5 +1,6 @@
 function tests = testRoulette
-   % Tests for Russian roulette (defect N) in src/mcrt.m. A packet below
+   % Tests for Russian roulette (defect N) in src/roulette.m and its use
+   % in src/mcrt.m. A packet below
    % wmin must either die or survive with wrr times its weight, and a
    % survivor that is still below wmin must keep playing. Discarding it
    % loses weight without compensation.
@@ -25,21 +26,20 @@ function testDeepAbsorbingSlabConservesWeight(testCase)
    testCase.verifyEqual(returned, expected, 'AbsTol', 1e-6);
 end
 
-function testRouletteBlockIsTerminateOrBoost(testCase)
-   % Evaluate the kernel's roulette block, read from src/mcrt.m, on a
-   % packet below wmin. Every outcome must be 0 or wt*wrr, and the mean
-   % must equal the input weight within 5 standard errors (unbiased).
-   block = kernellines('% russian roulette', '');
-   v = struct('wmin', 1e-4, 'wrr', 10, 'wt', 5e-5);
+function testRouletteIsTerminateOrBoost(testCase)
+   % Call the kernel's roulette on a packet below wmin. Every outcome must
+   % be 0 or wt*wrr, and the mean must equal the input weight within 5
+   % standard errors (unbiased).
+   wrr = 10;
+   wt = 5e-5;
    rng(11, 'twister');
    ndraw = 1e5;
    returned = zeros(1, ndraw);
    for n = 1:ndraw
-      w = runblock(block, v);
-      returned(n) = w.wt;
+      returned(n) = roulette(wt, wrr);
    end
-   testCase.verifyTrue(all(returned == 0 | returned == v.wt*v.wrr));
-   expected = v.wt;
+   testCase.verifyTrue(all(returned == 0 | returned == wt*wrr));
+   expected = wt;
    tol = 5*std(returned)/sqrt(ndraw);
    testCase.verifyEqual(mean(returned), expected, 'AbsTol', tol);
 end

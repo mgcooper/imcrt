@@ -13,12 +13,6 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
    a = 1-w;        % co-albedo                         [-]
    c = 1/(ka+ks);  % extinction path length            [cm]
 
-   % henyey-greenstein terms (pre-computed so it runs fast)
-   hg1 = 1/(2*g);
-   hg2 = (1+g^2);
-   hg3 = (1-g^2);
-   hg4 = 1+g;
-   hg5 = -2*g;
    two_pi = 2*pi;
 
    % default settings
@@ -61,7 +55,9 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
          z = z+uz*l;       % new z-position
 
          % grid indices. The lower clamps catch r = 0 and z = 0 exactly,
-         % which ceil maps to bin 0 (defect I).
+         % which ceil maps to bin 0. binindex does the same clamp; two calls
+         % per step measured 10-13% of the loop (tests/perf), so these two
+         % stay inline and binindex serves the exit angle below.
          ir = ceil(sqrt(x*x+y*y)/dr); % radial index
          iz = ceil(z/dz);             % vertical index
          if ir<1; ir = 1; end         % radial on-axis
@@ -70,13 +66,11 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
          if iz>nz; iz = nz+1; end     % vertical overflow
 
          % score transmittance / reflectance. Direct means unscattered
-         % (ns==0) only: a scattered grazing exit is diffuse (defect A). The
-         % angular index is clamped because acos(1) = 0 gives bin 0 on axis
-         % and rounding at grazing can give bin na+1 (defect J).
+         % (ns==0) only: a scattered grazing exit is diffuse. The angular
+         % index is clamped: acos(1) = 0 on axis, and rounding at grazing
+         % can reach na+1.
          if z>Z                       % transmittance
-            iu = ceil(acos(uz)/da);   % angular index
-            if iu<1; iu = 1; end      % on axis
-            if iu>na; iu = na; end    % grazing
+            iu = binindex(acos(uz), da, na); % angular index
             if ns==0
                Tdr = Tdr+wt; % direct
             else
@@ -85,9 +79,7 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
             break % photon escapes
          end
          if z<0                       % reflection
-            iu = ceil(acos(-uz)/da);  % angular index
-            if iu<1; iu = 1; end      % on axis
-            if iu>na; iu = na; end    % grazing
+            iu = binindex(acos(-uz), da, na); % angular index
             if ns==0
                % unreachable for the vertical source (no specular term);
                % kept for the isotropic source noted at the uz = 1 line
@@ -109,43 +101,16 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
          % absorption and scattering by ice (henyey-greenstein with azimuthal
          % symmetry)
          wt = wt*w; ns = ns+1;
-         if g == 0
-            us = 1-2*rand;
-         else
-            us = hg1*(hg2-(hg3/(hg4+hg5*rand))^2);
-         end
+         us = hgcos(g);    % polar scattering cosine
          ps = two_pi*rand; % azimuth angle, phi_s
-         % new direction cosines: an inline copy of chgdir, because a function
-         % call in this loop costs more than the scattering itself. The
-         % temporaries uxn and uyn keep uy from reading the updated ux (B).
-         % tests/testChgdirOracle.m evaluates this block against chgdir.
-         sinth = sqrt(1-uz*uz);
-         sinths = sqrt(1-us*us);
-         cps = cos(ps);
-         sps = sin(ps);
-         if sinth < 1e-12
-            % initial direction straight up or down (sin(theta)=0)
-            ux = sinths*cps;
-            uy = sinths*sps;
-            uz = sign(uz)*us;
-         else
-            % if initial direction not straight up or straight down
-            uxn = sinths/sinth*(ux*uz*cps-uy*sps)+ux*us;
-            uyn = sinths/sinth*(uy*uz*cps+ux*sps)+uy*us;
-            uz = -sinths*sinth*cps+uz*us;
-            ux = uxn;
-            uy = uyn;
-         end
-         % russian roulette (Wang et al. 1995, Sect. 3.9): a packet below wmin
-         % survives with probability 1/wrr carrying wrr times its weight, or
-         % dies. A survivor can still sit below wmin, so the loop runs on
-         % wt > 0 and it plays again next step instead of being dropped (N).
+         
+         % new direction cosines from the polar cosine and the azimuth
+         [ux,uy,uz] = chgdir(ux,uy,uz,us,ps);
+         % russian roulette below wmin: the packet survives with wrr times
+         % its weight or dies. A survivor can still sit below wmin, so the
+         % loop runs on wt > 0 and it plays again on the next step.
          if wt < wmin
-            if rand < 1/wrr
-               wt = wt*wrr;
-            else
-               wt = 0;
-            end
+            wt = roulette(wt, wrr);
          end
       end
    end

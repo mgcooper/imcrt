@@ -1,9 +1,10 @@
 function tests = testDirectBeam
-   % Tests for the direct tally (defect A) and the index clamps (I, J) in
-   % src/mcrt.m. Direct means unscattered only, so direct transmittance is
-   % Beer-Lambert and direct reflectance is exactly zero. Scattered packets
-   % that leave exactly along the axis or exactly at grazing must land in
-   % a valid angular and radial bin instead of raising an index error.
+   % Tests for the direct tally (defect A) in src/mcrt.m and the index
+   % clamps (I, J) in src/binindex.m. Direct means unscattered only, so
+   % direct transmittance is Beer-Lambert and direct reflectance is
+   % exactly zero. Scattered packets that leave exactly along the axis or
+   % exactly at grazing must land in a valid angular and radial bin
+   % instead of raising an index error.
    tests = functiontests(localfunctions);
 end
 
@@ -63,50 +64,28 @@ end
 
 function testClampsOnCraftedIndices(testCase)
    % The upper angular clamp fires only when acos(uz)/da rounds above na,
-   % and the vertical clamp only when a step lands on z = 0 exactly. Neither
-   % is reachable through the public API, so evaluate the kernel's scoring
-   % block, read from src/mcrt.m between its markers, on crafted values.
-   % Each case first proves that the unclamped index is out of range.
-   block = kernellines('% grid indices', '% absorption and scattering by ice');
-   v = struct('dr', 0.001, 'dz', 0.001, 'nr', 20, 'nz', 20, 'na', 30, ...
-      'Z', 0.02, 'a', 0.1, 'wt', 1, 'Tdr', 0, 'Rdr', 0, ...
-      'Tdf_ra', zeros(30, 21), 'Rdf_ra', zeros(30, 21), ...
-      'Adr_z', zeros(21, 1), 'Adf_rz', zeros(21, 21));
-   % Grazing transmittance: da is a hair below (pi/2)/30 so acos(0)/da
-   % rounds above 30 and ceil gives 31.
-   v.da = (pi/2)/30*(1 - 4*eps);
-   v.x = 0.005;
-   v.y = 0;
-   v.z = v.Z + v.dz;
-   v.uz = 0;
-   v.ns = 1;
-   returned = ceil(acos(v.uz)/v.da);
-   expected = v.na + 1;
+   % and the lower clamps only when a step lands on r = 0 or z = 0
+   % exactly. Neither is reachable through the public API, so call the
+   % kernel's index function on crafted values. Each case first proves
+   % that the unclamped index is out of range.
+   na = 30;
+   % Grazing exit: da is a hair below (pi/2)/30 so acos(0)/da rounds above
+   % 30 and ceil gives 31; the clamp keeps the last bin.
+   da = (pi/2)/30*(1 - 4*eps);
+   returned = [ceil(acos(0)/da), binindex(acos(0), da, na)];
+   expected = [na + 1, na];
    testCase.verifyEqual(returned, expected);
-   w = runblock(block, v);
-   returned = w.Tdf_ra(v.na, 5);
-   expected = v.wt;
+   % On the axis and on the surface: ceil(0) is 0, the clamp gives bin 1.
+   returned = [ceil(0/0.001), binindex(0, 0.001, 21), binindex(0, 0.001, 21)];
+   expected = [0, 1, 1];
    testCase.verifyEqual(returned, expected);
-   % The mirrored grazing reflection: z < 0 with -uz = 0 hits the same
-   % rounding in the reflection branch and must land in Rdf_ra(na, :).
-   v.z = -v.dz;
-   w = runblock(block, v);
-   returned = w.Rdf_ra(v.na, 5);
-   expected = v.wt;
+   % Radial overflow: past R the index is the overflow bin nr+1.
+   returned = binindex(0.05, 0.001, 21);
+   expected = 21;
    testCase.verifyEqual(returned, expected);
-   % Unscattered packet landing on z = 0 exactly with r = 0: both ceil
-   % results are 0, and the direct absorption must go to depth bin 1.
-   v.x = 0;
-   v.y = 0;
-   v.z = 0;
-   v.uz = 0.5;
-   v.ns = 0;
-   returned = [ceil(sqrt(v.x^2 + v.y^2)/v.dr), ceil(v.z/v.dz)];
-   expected = [0, 0];
-   testCase.verifyEqual(returned, expected);
-   w = runblock(block, v);
-   returned = w.Adr_z(1);
-   expected = v.a*v.wt;
+   % Interior: an ordinary coordinate is unchanged by the clamp.
+   returned = binindex(0.0045, 0.001, 21);
+   expected = 5;
    testCase.verifyEqual(returned, expected);
 end
 

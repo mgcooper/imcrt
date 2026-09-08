@@ -48,11 +48,12 @@ caller's global random stream when the file finishes. `testSetup.m` covers
   maps a onto b for generic, parallel, antiparallel, and near-antiparallel
   pairs.
 - `testChgdirOracle.m`: the direction update keeps the unit norm, deflects
-  by the sampled cosine, matches the oracle's azimuth spacing, and the
-  inline copy in `mcrt.m` agrees with `chgdir`.
+  by the sampled cosine, and matches the oracle's azimuth spacing.
+- `testHgcos.m`: the Henyey-Greenstein sampler's mean is g, every draw is
+  a cosine, and g = 0 takes the isotropic branch.
 - `testDirectBeam.m`: direct transmittance is Beer-Lambert, direct
-  reflectance is zero, and on-axis, grazing, and crafted exits land in
-  valid bins.
+  reflectance is zero, on-axis and grazing exits land in valid bins, and
+  `binindex` clamps crafted coordinates into range.
 - `testFluenceBalance.m`: ka times the volume integral of the fluence
   returns the absorbed weight, the direct beam's absorption sits in radial
   bin 1, and a purely absorbing slab is Beer-Lambert.
@@ -89,6 +90,12 @@ caller's global random stream when the file finishes. `testSetup.m` covers
   case through the pre-fix kernel and each fix tag (extracted from git),
   with attribution per quantity, plus the retrospective against the
   frozen 2021 verification script. MATLAB only.
+- `verify/kernelfiles.m`: the one list of every source file that shapes an
+  mcrt result, read by the driver's fingerprint, the source-clean check,
+  and the impact report's kernel extraction.
+- `verify/extractfiles.m`: extracts a list of repository files at a git ref
+  into a scratch folder; it refuses an unknown ref or a ref without the
+  kernel and skips a helper the ref predates.
 - `verify/impactquantities.m`, `verify/impactattribution.m`,
   `verify/relchange.m`, `verify/pairedratio.m`, `verify/unpairedratio.m`,
   `verify/srcmatches.m`, `verify/impactargs.m`, `verify/srctext.m`,
@@ -110,15 +117,47 @@ caller's global random stream when the file finishes. `testSetup.m` covers
 - `verify/vdhangular.m`: interpolates each run's angular tallies (pchip
   between bin centers) to the table's mu values and returns z-scores from
   the spread over runs.
-- `testRoulette.m`: roulette is terminate-or-boost and unbiased, and a
+- `testRoulette.m`: `roulette` is terminate-or-boost and unbiased, and a
   deep absorbing slab conserves weight to 1e-6.
-- `kernellines.m`: reads a block of `src/mcrt.m` between two marker
-  comments so tests can evaluate the kernel's inline code.
-- `runblock.m`: evaluates such a block with a struct as its workspace and
-  returns every variable afterward.
+- `perf/perfcases.m`, `perf/perfbench.m`, `perf/perfoverhead.m`,
+  `perf/baseline.txt`: the timing cases, the timeit harness with its
+  baseline reader and writer, the function-call overhead microbenchmark,
+  and the baseline measured on one machine and release (see Performance).
+- `perf/testPerf.m`: the on-demand perf suite, `runtests('tests/perf')`:
+  the kernel's normalized time stays within a factor of two of the
+  baseline on the baseline's host and release (filtered elsewhere), a
+  written baseline reads back, and the overhead numbers are finite and
+  positive. It is not in the fast suite because timing on a loaded laptop
+  is not repeatable.
 - `testBuildgrid.m`: grid lengths, orientation, optimized centers, and
   widths for integral inputs; current floor-based lengths for non-integral
   inputs (characterization until hardening, defect K).
+
+## Performance
+
+`perfbench()` times one seeded run of each perf case with `timeit` three
+times, times a fixed reference loop right after each, and keeps the least
+case timing with its paired reference; `perfbench('write')` records them
+with the architecture, host, and MATLAB release in `perf/baseline.txt`.
+`testPerf` compares each case divided by its reference with the same ratio
+from that file when the host and release match, with a tolerance of a
+factor of two. The reference
+cancels most load and thermal drift, and the tolerance is wide because a
+laptop still swings by tens of percent, so the test catches a tripled loop,
+not a small change. Run the perf suite and re-capture the baseline after a
+deliberate speed change or a MATLAB upgrade:
+
+    runtests('tests/perf')
+
+    Setup; addpath('tests', 'tests/perf'); perfbench('write')
+
+`perfoverhead()` times a bare function call and, written out and as a
+call, the direction update, the radial index clamp, the Henyey-Greenstein
+draw, and roulette, plus one tally event with and without a sum-of-squares
+accumulate. It is the evidence behind the kernel's calls to `chgdir`,
+`hgcos`, and `roulette`, the exit-only `binindex` call, and the absence of
+per-bin variance tallies. The baseline records the architecture, the host
+name, and the MATLAB release; `testPerf` compares only on that host.
 
 ## Golden digest
 
