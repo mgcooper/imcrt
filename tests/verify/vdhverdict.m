@@ -3,7 +3,10 @@ function V = vdhverdict(RTs, ref, tmax, abstol, reltol)
    % (cell array RTs). V is a struct of column arrays: metric and verdict
    % are cellstr; model, reference, se, and t are double. The rows are the
    % hemispherical Rd, Tt, Tdr, and Rdr, then twelve angular entries.
-   % model is the mean over runs and se the run spread over sqrt(M); t is
+   % model is the mean over runs and se the run spread over sqrt(M), or,
+   % with fewer than four runs, the per-run standard errors in RT.se
+   % combined as sqrt(sum of squares)/M, since a spread over so few runs
+   % is itself too uncertain; t is
    % the distance to the reference in standard errors. A statistical row
    % passes when |t| <= tmax. Rdr has no spread test and passes only when
    % every run returns exactly zero. The model has no specular term and
@@ -24,11 +27,17 @@ function V = vdhverdict(RTs, ref, tmax, abstol, reltol)
       reltol = 0;
    end
    M = numel(RTs);
+   perrun = M < 4;
    hemi = zeros(M, 4);
+   sepr = zeros(M, 4);
    for n = 1:M
       hemi(n, :) = [RTs{n}.Rdf, RTs{n}.Tt, RTs{n}.Tdr, RTs{n}.Rdr];
+      if perrun
+         sepr(n, :) = [RTs{n}.se.Rdf, RTs{n}.se.Tt, RTs{n}.se.Tdr, ...
+            RTs{n}.se.Rdr];
+      end
    end
-   [ta, ma, sa] = vdhangular(RTs, ref);
+   [ta, ma, sa] = vdhangular(RTs, ref, perrun);
    mu = ref.mu(2:end);
    label = @(fmt) arrayfun(@(x) sprintf(fmt, x), mu, 'UniformOutput', false)';
    V.metric = [{'Rd'; 'Tt'; 'Tdr'; 'Rdr'}; label('R(mu=%.1f)'); ...
@@ -36,7 +45,11 @@ function V = vdhverdict(RTs, ref, tmax, abstol, reltol)
    V.model = [mean(hemi, 1)'; ma];
    V.reference = [ref.Rd; ref.Tt; ref.Tdr; 0; ref.R_sr(2:end)'; ...
       ref.T_sr(2:end)'];
-   V.se = [std(hemi, 0, 1)'/sqrt(M); sa];
+   if perrun
+      V.se = [sqrt(sum(sepr.^2, 1))'/M; sa];
+   else
+      V.se = [std(hemi, 0, 1)'/sqrt(M); sa];
+   end
    V.t = [(V.model(1:3) - V.reference(1:3))./V.se(1:3); NaN; ta];
    V.verdict = repmat({'FAIL'}, numel(V.t), 1);
    V.verdict(abs(V.t) <= tmax) = {'PASS'};

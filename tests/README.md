@@ -65,7 +65,8 @@ caller's global random stream when the file finishes. `testSetup.m` covers
 - `verify/vdhtable35.m`: van de Hulst Table 35 references and case
   parameters, the one source for the tests and `mcrt_verify.m`.
 - `testVerify.m`: the verification layer: case table, van de Hulst and
-  fluence verdict tables, and `mcrt_verify` running for each
+  fluence verdict tables, the per-run errors below four runs, and
+  `mcrt_verify` running for each
   case at its interactive size.
 - `verify/verifycases.m`: the cases `mcrt_verify.m` runs, with kernel
   inputs, run count, packets, seeds, and the t cutoff.
@@ -130,8 +131,10 @@ caller's global random stream when the file finishes. `testSetup.m` covers
   positive. It is not in the fast suite because timing on a loaded laptop
   is not repeatable.
 - `testScale.m`: `scaleR`, `scaleT`, and `scaleA` normalize synthetic raw
-  tallies by measure and N, add direct to diffuse, and close the fluence
-  balance on a small grid.
+  tallies by measure and N, add direct to diffuse, close the fluence
+  balance on a small grid, and return standard errors through `tallyse`.
+- `testTallySe.m`: `tallyse` on known contributions, and the kernel's
+  per-run `RT.se` against the spread of one hundred seeded runs.
 - `testBuildgrid.m`: grid lengths, orientation, optimized centers, and
   widths for integral inputs; a fractional bin count is refused by name,
   and whole counts with floating-point error give round(n) bins (K).

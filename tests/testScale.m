@@ -33,19 +33,28 @@ end
 function testReflectanceAndTransmittance(testCase)
    % Both functions apply the same rule: sums over N, resolved tallies
    % over measure, projection factor, and N. Rt and Tt add the direct
-   % part.
+   % part. With unit weights the squares equal the sums, and every
+   % standard error is tallyse of the raw sum scaled like its output.
    grid = smallgrid();
    N = 10;
    raw = [1 2; 0 3; 4 0];
    direct = 2;
-   [ra, r, a, df, dr, t] = scaleR(raw, direct, grid, N);
-   [tra, tr, ta, tdf, tdr, tt] = scaleT(raw, direct, grid, N);
+   [ra, r, a, df, dr, t, se] = scaleR(raw, direct, raw, direct, grid, N);
+   [tra, tr, ta, tdf, tdr, tt, tse] = scaleT(raw, direct, raw, direct, ...
+      grid, N);
    cosa = cos(grid.ai);
    returned = {ra, r, a, df, dr, t, tra, tr, ta, tdf, tdr, tt};
    expected = {raw./(grid.dA.*grid.dsr.*cosa.*N), sum(raw, 1)./(grid.dA*N), ...
       sum(raw, 2)./(grid.dsr*N), sum(raw(:))/N, direct/N, ...
       (sum(raw(:)) + direct)/N};
    expected = [expected, expected];
+   testCase.verifyEqual(returned, expected, 'AbsTol', 1e-15);
+   returned = {se.ra, se.r, se.a, se.df, se.dr, se.t, tse};
+   expected = {tallyse(raw, raw, N)./(grid.dA.*grid.dsr.*cosa), ...
+      tallyse(sum(raw, 1), sum(raw, 1), N)./grid.dA, ...
+      tallyse(sum(raw, 2), sum(raw, 2), N)./grid.dsr, ...
+      tallyse(sum(raw(:)), sum(raw(:)), N), tallyse(direct, direct, N), ...
+      tallyse(sum(raw(:)) + direct, sum(raw(:)) + direct, N), se};
    testCase.verifyEqual(returned, expected, 'AbsTol', 1e-15);
 end
 

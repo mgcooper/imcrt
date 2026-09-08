@@ -86,6 +86,32 @@ function testVdhVerdictRules(testCase)
    testCase.verifyEqual(returned, expected);
 end
 
+function testVdhVerdictWithFewRuns(testCase)
+   % Below four runs the verdict takes its standard errors from RT.se
+   % instead of the run spread. Two runs at N = 2e4 give finite, positive
+   % errors on every statistical row and a passing table at tmax 4; the
+   % Rdr row keeps its exact rule.
+   ref = vdhtable35();
+   RTs = runcase(ref, 2, 2e4, 1:2);
+   V = vdhverdict(RTs, ref, 4, 5e-4, 0.02);
+   rows = [1:3, 5:16];
+   returned = {all(isfinite(V.se(rows)) & V.se(rows) > 0), isnan(V.t(4)), ...
+      nnz(strcmp(V.verdict, 'PASS'))};
+   expected = {true, true, 16};
+   testCase.verifyEqual(returned, expected, mat2str(V.t', 3));
+   % A run with no diffuse exit on one side (no scattering) gives zero
+   % angular errors on that side, not NaN; a one-packet run, whose errors
+   % are undefined, keeps NaN.
+   rng(3, 'twister');
+   RT = mcrt(10, 0, 0.5, 0.02, 0.001, 200);
+   [~, ~, se] = vdhangular({RT}, ref, true);
+   RT1 = mcrt(10, 0, 0.5, 0.02, 0.001, 1);
+   [~, ~, se1] = vdhangular({RT1}, ref, true);
+   returned = {se(1:6)', all(isnan(se1(1:6)))};
+   expected = {zeros(1, 6), true};
+   testCase.verifyEqual(returned, expected);
+end
+
 function testFluenceVerdictRules(testCase)
    % The configured fluence case must pass all 12 rows. Each rule also
    % gets a failing input. An inflated absorbed weight fails the energy

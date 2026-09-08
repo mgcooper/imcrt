@@ -7,6 +7,12 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
    %  absorption (A), and fluence (phi) tallies, diffuse (df) and direct
    %  (dr), resolved by radius (r), angle (a), and depth (z) on a grid with
    %  vertical spacing dz, plus that grid and its bin measures in RT.grid.
+   %  RT.se holds the standard error of every reflectance and
+   %  transmittance output from this one run (sum of squared weights,
+   %  tallyse), and RT.N the packet count those errors and the exclusive
+   %  bins' covariance, -x_i*x_j/(N-1), refer to. Absorption and fluence
+   %  carry no per-run error because a packet deposits in one bin many
+   %  times; use the spread over seeded runs for those.
    %
    %  ka is a finite positive scalar (the fluence is absorption over ka)
    %  and ks a finite nonnegative one, with a finite sum; g lies in
@@ -72,6 +78,11 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
    Rdf_ra = zeros(na,nr+1);   % reflectance, diffuse
    Tdr = 0;                   % transmittance, direct (unscattered)
    Rdr = 0;                   % reflectance, direct (unscattered)
+   % squared weights of the exit tallies, for their standard errors
+   Tdf_ss = zeros(na,nr+1);
+   Rdf_ss = zeros(na,nr+1);
+   Tdr_ss = 0;
+   Rdr_ss = 0;
 
    % monte carlo
    for n = 1:N
@@ -110,8 +121,10 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
             iu = binindex(acos(uz), da, na); % angular index
             if ns==0
                Tdr = Tdr+wt; % direct
+               Tdr_ss = Tdr_ss+wt*wt;
             else
                Tdf_ra(iu,ir) = Tdf_ra(iu,ir)+wt; % diffuse
+               Tdf_ss(iu,ir) = Tdf_ss(iu,ir)+wt*wt;
             end
             break % photon escapes
          end
@@ -121,8 +134,10 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
                % unreachable for the vertical source (no specular term);
                % kept for the isotropic source noted at the uz = 1 line
                Rdr = Rdr+wt; % direct
+               Rdr_ss = Rdr_ss+wt*wt;
             else
                Rdf_ra(iu,ir) = Rdf_ra(iu,ir)+wt; % diffuse
+               Rdf_ss(iu,ir) = Rdf_ss(iu,ir)+wt*wt;
             end
             break % photon escapes
          end
@@ -156,9 +171,12 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
    % convert the photon counts to SI units (Wang et al. 1995, Sect. 4):
    % scaleR and scaleT sum the resolved tallies and divide by the bin
    % measures and N; scaleA does the same for absorption and forms the
-   % fluence. Rt is Rdf + Rdr, which the output does not carry.
-   [Rdf_ra,Rdf_r,Rdf_a,Rdf,Rdr,~] = scaleR(Rdf_ra,Rdr,grid,N);
-   [Tdf_ra,Tdf_r,Tdf_a,Tdf,Tdr,Tt] = scaleT(Tdf_ra,Tdr,grid,N);
+   % fluence. Rt is Rdf + Rdr, which the output does not carry. The
+   % squared weights give each exit output its standard error.
+   [Rdf_ra,Rdf_r,Rdf_a,Rdf,Rdr,~,seR] = scaleR(Rdf_ra,Rdr,Rdf_ss,Rdr_ss, ...
+      grid,N);
+   [Tdf_ra,Tdf_r,Tdf_a,Tdf,Tdr,Tt,seT] = scaleT(Tdf_ra,Tdr,Tdf_ss,Tdr_ss, ...
+      grid,N);
    [Adf_rz,Adf_z,Adf,Adr_z,phi_rz,phi_z] = scaleA(Adf_rz,Adr_z,ka,grid,N);
 
    % arrange the output
@@ -181,6 +199,12 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
    RT.phi_rz = phi_rz;
    RT.phi_z = phi_z;
 
+   % standard errors of the exit outputs from this run, and the packet
+   % count behind them
+   RT.se = struct('Rdf_ra', seR.ra, 'Rdf_r', seR.r, 'Rdf_a', seR.a, ...
+      'Rdf', seR.df, 'Rdr', seR.dr, 'Tdf_ra', seT.ra, 'Tdf_r', seT.r, ...
+      'Tdf_a', seT.a, 'Tdf', seT.df, 'Tdr', seT.dr, 'Tt', seT.t);
+   RT.N = N;
 
    % return the grid
    RT.grid = grid;

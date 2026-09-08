@@ -21,7 +21,7 @@ function testFieldsAndShapes(testCase)
       returned = sort(fieldnames(RT));
       expected = sort({'Rdf_ra'; 'Rdf_r'; 'Rdf_a'; 'Rdf'; 'Rdr'; 'Tdf_ra'; ...
          'Tdf_r'; 'Tdf_a'; 'Tdf'; 'Tdr'; 'Tt'; 'Adf_z'; 'Adf'; 'Adf_rz'; ...
-         'Adr_z'; 'phi_rz'; 'phi_z'; 'grid'});
+         'Adr_z'; 'phi_rz'; 'phi_z'; 'grid'; 'se'; 'N'});
       testCase.verifyEqual(returned, expected, c.name);
       na = numel(RT.grid.ai);
       nr = numel(RT.grid.ri);
