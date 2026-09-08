@@ -178,7 +178,12 @@ The baseline matches the kernel at HEAD. A behavior-neutral commit
 that it is neutral. Only a commit that carries a physics fix may
 re-baseline, and it must quantify the delta in its commit message. The
 file's history therefore holds one version per physics fix; its first
-version, from commit 3c99b8d, digests the pre-fix kernel.
+version, from commit 3c99b8d, digests the pre-fix kernel; the last pre-fix
+commit, b9d51d5, carries the tag `cooper2021-as-published`. Each physics-fix
+commit carries a tag:
+`fix-B-aliasing`, `fix-A-direct-tally`, `fix-C-fluence`, `fix-N-roulette`,
+and `fix-S-bin-measures`. Any output can be compared across fixes by
+checking out a tag and running `mcrtgolden`.
 
 Re-baseline with one command from the repo root:
 
@@ -190,3 +195,7 @@ it with a temporary folder.
 The digest assumes one machine and one MATLAB version: floating-point sums
 and the Mersenne Twister stream are reproducible there, and nowhere else is
 promised. The current baseline was captured on macOS with R2025b Update 3.
+A MATLAB upgrade is the one exception to the physics-fix rule above: after
+an upgrade, run the suite first, and if only `testGolden` fails, re-baseline
+with the command above in a commit that changes nothing else and names the
+new release. Re-capture the perf baseline the same way.
