@@ -1,7 +1,8 @@
 function tests = testBuildgrid
    % Unit tests for buildgrid: grid vector lengths, orientation, optimized
-   % center coordinates, and bin widths for integral R/dr, A/da, and Z/dz,
-   % and the rejection of a fractional bin count (defect K).
+   % center coordinates, bin widths and measures for integral R/dr, A/da,
+   % and Z/dz, the rejection of a fractional bin count (defect K), and the
+   % comparison plot.
    tests = functiontests(localfunctions);
 end
 
@@ -14,7 +15,8 @@ function testIntegralLengthsAndOrientation(testCase)
    % The kernel default grid: 2000 radial bins, 30 angular, 20 vertical.
    % r and z carry one overflow bin and a does not. r is a row; a and z
    % are columns, which the kernel's broadcasting relies on.
-   [ri, ai, zi, dr, da, dz] = buildgrid(2, pi/2, 0.02, 0.001, pi/60, 0.001);
+   [~, ri, ai, zi, dr, da, dz] = buildgrid(2, pi/2, 0.02, 0.001, pi/60, ...
+      0.001);
    returned = {size(ri), size(ai), size(zi), size(dr), size(da), size(dz)};
    expected = {[1 2001], [30 1], [21 1], [1 2001], [30 1], [21 1]};
    testCase.verifyEqual(returned, expected);
@@ -30,7 +32,7 @@ function testOptimizedCenters(testCase)
    dr = 0.001;
    da = A/30;
    dz = 0.001;
-   [ri, ai, zi] = buildgrid(R, A, Z, dr, da, dz);
+   [~, ri, ai, zi] = buildgrid(R, A, Z, dr, da, dz);
    rc = [dr/2:dr:R-dr/2, R+dr/2];
    ac = (da/2:da:A-da/2)';
    returned = ri;
@@ -44,17 +46,19 @@ function testOptimizedCenters(testCase)
    testCase.verifyEqual(returned, expected, 'AbsTol', 1e-15);
 end
 
-function testWidthsFollowCenters(testCase)
-   % The returned widths are derivative() of each center vector, not the
-   % input bin sizes, so the shifted r and a centers get shifted widths.
-   % The z widths sum back to the slab thickness because z is unshifted.
+function testWidthsAndMeasures(testCase)
+   % The returned widths are the nominal bin widths, one per bin with the
+   % overflow bins included, and the grid struct carries them with the
+   % annulus areas and solid angles computed from the bin edges: the areas
+   % sum to pi*R^2 inside R, and the solid angles to 2*pi over the
+   % hemisphere.
+   R = 2;
    Z = 0.02;
-   [ri, ai, zi, dr, da, dz] = buildgrid(2, pi/2, Z, 0.001, pi/60, 0.001);
-   returned = {dr, da, dz};
-   expected = {derivative(ri), derivative(ai), derivative(zi)};
-   testCase.verifyEqual(returned, expected);
-   returned = sum(dz(1:end-1));
-   expected = Z;
+   [grid, ~, ~, ~, dr, da, dz] = buildgrid(R, pi/2, Z, 0.001, pi/60, 0.001);
+   returned = {dr, da, dz, sum(grid.dA(1:end-1)), sum(grid.dsr), ...
+      sum(dz(1:end-1)), sort(fieldnames(grid))};
+   expected = {0.001*ones(1, 2001), pi/60*ones(30, 1), 0.001*ones(21, 1), ...
+      pi*R^2, 2*pi, Z, sort({'ri'; 'ai'; 'zi'; 'dr'; 'da'; 'dz'; 'dA'; 'dsr'})};
    testCase.verifyEqual(returned, expected, 'RelTol', 1e-12);
 end
 
@@ -90,12 +94,12 @@ function testWholeCountsWithRoundoff(testCase)
    % 0.02/0.001 and 0.1/0.005, and a ratio 1e-10 relative below a whole
    % number, pass the check and give round(n) bins, the sizes mcrt uses
    % for its tallies.
-   [ri, ~, zi] = buildgrid(2, pi/2, 0.02, 0.001, pi/60, 0.001);
-   [ri2, ~, zi2] = buildgrid(0.1, pi/2, 0.1, 0.005, pi/60, 0.005);
-   [~, ~, zi3] = buildgrid(0.1, pi/2, 20*(1 - 1e-10), 0.005, pi/60, 1);
+   [~, ri, ~, zi] = buildgrid(2, pi/2, 0.02, 0.001, pi/60, 0.001);
+   [~, ri2, ~, zi2] = buildgrid(0.1, pi/2, 0.1, 0.005, pi/60, 0.005);
+   [~, ~, ~, zi3] = buildgrid(0.1, pi/2, 20*(1 - 1e-10), 0.005, pi/60, 1);
    % one bin a rounding error short: the colon is empty and the center
    % is built directly
-   [~, ~, zi4] = buildgrid(0.1, pi/2, 1 - 1e-10, 0.005, pi/60, 1);
+   [~, ~, ~, zi4] = buildgrid(0.1, pi/2, 1 - 1e-10, 0.005, pi/60, 1);
    returned = {numel(ri), numel(zi), numel(ri2), numel(zi2), numel(zi3), ...
       zi4};
    expected = {2001, 21, 21, 21, 21, [0.5; 1.5]};
@@ -104,11 +108,24 @@ end
 
 function testOneAngularBin(testCase)
    % A single angular bin (A = da) is allowed: its center is the shifted
-   % half-width and its width is the input width, since derivative needs
-   % two points.
-   [~, ai, ~, ~, da] = buildgrid(0.02, pi/2, 0.02, 0.001, pi/2, 0.001);
+   % half-width and its width is the input width.
+   [~, ~, ai, ~, ~, da] = buildgrid(0.02, pi/2, 0.02, 0.001, pi/2, 0.001);
    ac = pi/4;
    returned = {numel(ai), ai, da};
    expected = {1, ac + cot(ac)*(1 - pi/4*cot(pi/4)), pi/2};
    testCase.verifyEqual(returned, expected, 'AbsTol', 1e-15);
+end
+
+function testPlotOption(testCase)
+   % The seventh argument draws the comparison of bin centers and optimized
+   % coordinates: one new figure with four axes, and only that figure is
+   % closed afterward.
+   before = findall(0, 'Type', 'figure');
+   buildgrid(0.02, pi/2, 0.02, 0.001, pi/60, 0.001, true);
+   after = findall(0, 'Type', 'figure');
+   new = setdiff(after, before);
+   testCase.addTeardown(@() close(new));
+   returned = {numel(new), numel(findall(new, 'Type', 'axes'))};
+   expected = {1, 4};
+   testCase.verifyEqual(returned, expected);
 end

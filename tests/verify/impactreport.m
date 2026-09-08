@@ -93,8 +93,9 @@ function reportfile = impactreport(varargin)
       'grid. The paper''s rod geometry is not part of src/mcrt.m.\n\n'], ...
       refs{1, 1}, strjoin(refs(2:end, 1)', ', '));
    % A helper that a ref predates (its code was inline then) is skipped by
-   % extractfiles, so one list serves every ref.
-   kfiles = kernelfiles();
+   % extractfiles, so one list serves every ref. Historical grid builders
+   % call the third-party derivative, so it joins the list here.
+   kfiles = [kernelfiles(), {'src/derivative/derivative.m'}];
    cases = [mcrtcases(), struct('name', 'paper_radial', 'ka', 0.01, ...
       'ks', 9.99, 'g', 0.9, 'Z', 1, 'dz', 0.05, 'N', N, 'seed', 45)];
    for k = 1:numel(cases)

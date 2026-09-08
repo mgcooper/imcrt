@@ -1,10 +1,15 @@
 function i = binindex(v, d, n)
-   % Bin index of a coordinate v on a grid of width d with n bins, clamped
-   % into 1:n. ceil maps v = 0 exactly (a packet on the axis or on the
-   % surface) to bin 0, and rounding at the far edge can give n+1; both
-   % must land in a valid bin. The caller passes n as the count including
-   % any overflow bin, so the clamp above is the overflow bin.
+   %BININDEX Return the bin index for a coordinate on a uniform grid.
+   %
+   %   I = BININDEX(V,D,N) returns the bin containing coordinate V for a
+   %   grid with bin width D and N bins. The result is clamped to 1:N.
+   %
+   %   V = 0 is assigned to the first bin. Values that round beyond the
+   %   final edge are assigned to bin N. If N includes an overflow bin,
+   %   these values are assigned to that overflow bin.
+
    i = ceil(v/d);
+
    if i < 1
       i = 1;
    elseif i > n

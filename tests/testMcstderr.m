@@ -1,5 +1,5 @@
-function tests = testTallySe
-   % Tests for the per-run standard errors: tallyse on known contributions,
+function tests = testMcstderr
+   % Tests for the per-run standard errors: mcstderr on known contributions,
    % and the kernel's RT.se against the spread of many seeded runs, which
    % is the independent estimate of the same error.
    tests = functiontests(localfunctions);
@@ -16,12 +16,12 @@ function testFormulaOnKnownContributions(testCase)
    % the mean is sqrt(1/12). Weighted hits use their squares. One packet
    % gives NaN, and a negative round-off inside the root is clamped to
    % zero (every packet in the bin with equal weight, so no spread).
-   returned = [tallyse(2, 2, 4), tallyse(0.5^2 + 0.25^2, 0.75, 4), ...
-      tallyse([2 4], [2 4], 4)];
+   returned = [mcstderr(2, 2, 4), mcstderr(0.5^2 + 0.25^2, 0.75, 4), ...
+      mcstderr([2 4], [2 4], 4)];
    expected = [sqrt(1/12), sqrt((0.3125 - 0.75^2/4)/12), ...
       [sqrt(1/12), 0]];
    testCase.verifyEqual(returned, expected, 'AbsTol', 1e-15);
-   testCase.verifyTrue(isnan(tallyse(1, 1, 1)));
+   testCase.verifyTrue(isnan(mcstderr(1, 1, 1)));
 end
 
 function testPerRunErrorMatchesRunSpread(testCase)

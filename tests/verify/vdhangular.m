@@ -35,9 +35,9 @@ function [z, model, se] = vdhangular(RTs, ref, perrun)
       V(n, 7:12) = interp1(ai, RTs{n}.Tdf_a, theta, 'pchip', RTs{n}.Tdf_a(1));
       if perrun
          S(n, 1:6) = pchipvar(ai, RTs{n}.Rdf_a, RTs{n}.se.Rdf_a, theta, ...
-            RTs{n}.N);
+            RTs{n}.grid.N);
          S(n, 7:12) = pchipvar(ai, RTs{n}.Tdf_a, RTs{n}.se.Tdf_a, theta, ...
-            RTs{n}.N);
+            RTs{n}.grid.N);
       end
    end
    model = mean(V, 1)';

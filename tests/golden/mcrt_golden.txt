@@ -18,6 +18,7 @@ vdh_reflectance Rdf_a.last 0.00055885103199630293
 vdh_reflectance Rdf_a.checksum 1215563
 vdh_reflectance Rdf 0.097720627110275182
 vdh_reflectance Rdr 0
+vdh_reflectance Rt 0.097720627110275182
 vdh_reflectance Tdf_ra.size [30 2001]
 vdh_reflectance Tdf_ra.sum 466752.3095779093
 vdh_reflectance Tdf_ra.sumsq 27929970109.705395
@@ -90,6 +91,7 @@ vdh_reflectance se.Rdf_a.last 0.00031224744762512412
 vdh_reflectance se.Rdf_a.checksum 30062999
 vdh_reflectance se.Rdf 0.0023510745349296152
 vdh_reflectance se.Rdr 0
+vdh_reflectance se.Rt 0.0023510745349296152
 vdh_reflectance se.Tdf_ra.size [30 2001]
 vdh_reflectance se.Tdf_ra.sum 85241.636974353838
 vdh_reflectance se.Tdf_ra.sumsq 619083960.68682218
@@ -111,7 +113,6 @@ vdh_reflectance se.Tdf_a.checksum 18901458
 vdh_reflectance se.Tdf 0.0036502076793617586
 vdh_reflectance se.Tdr 0.0033741722694388891
 vdh_reflectance se.Tt 0.0032897439843167352
-vdh_reflectance N 10000
 vdh_reflectance grid.ri.size [1 2001]
 vdh_reflectance grid.ri.sum 2002.0012970760313
 vdh_reflectance grid.ri.sumsq 2670.6688337842652
@@ -160,6 +161,7 @@ vdh_reflectance grid.dsr.sumsq 1.6231139781357242
 vdh_reflectance grid.dsr.first 0.0086108870940619572
 vdh_reflectance grid.dsr.last 0.3288365113028589
 vdh_reflectance grid.dsr.checksum 6974949
+vdh_reflectance grid.N 10000
 absorbing Rdf_ra.size [30 2001]
 absorbing Rdf_ra.sum 1837.1990970654952
 absorbing Rdf_ra.sumsq 171972.75331404925
@@ -180,6 +182,7 @@ absorbing Rdf_a.last 0.0001590455992638592
 absorbing Rdf_a.checksum 25752580
 absorbing Rdf 0.0051807099999999998
 absorbing Rdr 0
+absorbing Rt 0.0051807099999999998
 absorbing Tdf_ra.size [30 2001]
 absorbing Tdf_ra.sum 545.66321949122539
 absorbing Tdf_ra.sumsq 22399.184333784415
@@ -252,6 +255,7 @@ absorbing se.Rdf_a.last 6.8122123114780153e-05
 absorbing se.Rdf_a.checksum 24868868
 absorbing se.Rdf 0.00020940515882290046
 absorbing se.Rdr 0
+absorbing se.Rt 0.00020940515882290046
 absorbing se.Tdf_ra.size [30 2001]
 absorbing se.Tdf_ra.sum 505.00464401364729
 absorbing se.Tdf_ra.sumsq 21850.876700624955
@@ -273,7 +277,6 @@ absorbing se.Tdf_a.checksum 1413124
 absorbing se.Tdf 0.00011301674884397414
 absorbing se.Tdr 0.00086850413352096043
 absorbing se.Tt 0.00087452453250695358
-absorbing N 10000
 absorbing grid.ri.size [1 2001]
 absorbing grid.ri.sum 2002.0012970760313
 absorbing grid.ri.sumsq 2670.6688337842652
@@ -322,6 +325,7 @@ absorbing grid.dsr.sumsq 1.6231139781357242
 absorbing grid.dsr.first 0.0086108870940619572
 absorbing grid.dsr.last 0.3288365113028589
 absorbing grid.dsr.checksum 6974949
+absorbing grid.N 10000
 mini_fluence Rdf_ra.size [30 2001]
 mini_fluence Rdf_ra.sum 10584.636863509522
 mini_fluence Rdf_ra.sumsq 2182782.6473649787
@@ -342,6 +346,7 @@ mini_fluence Rdf_a.last 0.0012312012814712928
 mini_fluence Rdf_a.checksum 31204664
 mini_fluence Rdf 0.25900963725442239
 mini_fluence Rdr 0
+mini_fluence Rt 0.25900963725442239
 mini_fluence Tdf_ra.size [30 2001]
 mini_fluence Tdf_ra.sum 33796.099593974497
 mini_fluence Tdf_ra.sumsq 8688242.0591259021
@@ -414,6 +419,7 @@ mini_fluence se.Rdf_a.last 0.0012312012814712928
 mini_fluence se.Rdf_a.checksum 14444902
 mini_fluence se.Rdf 0.0085037460243816282
 mini_fluence se.Rdr 0
+mini_fluence se.Rt 0.0085037460243816282
 mini_fluence se.Tdf_ra.size [30 2001]
 mini_fluence se.Tdf_ra.sum 29871.720172879737
 mini_fluence se.Tdf_ra.sumsq 7493467.6735193096
@@ -435,7 +441,6 @@ mini_fluence se.Tdf_a.checksum 29213203
 mini_fluence se.Tdf 0.0090442333457234937
 mini_fluence se.Tdr 0
 mini_fluence se.Tt 0.0090442333457234937
-mini_fluence N 2000
 mini_fluence grid.ri.size [1 2001]
 mini_fluence grid.ri.sum 2002.0012970760313
 mini_fluence grid.ri.sumsq 2670.6688337842652
@@ -484,3 +489,4 @@ mini_fluence grid.dsr.sumsq 1.6231139781357242
 mini_fluence grid.dsr.first 0.0086108870940619572
 mini_fluence grid.dsr.last 0.3288365113028589
 mini_fluence grid.dsr.checksum 6974949
+mini_fluence grid.N 2000

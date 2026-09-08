@@ -1,6 +1,7 @@
-function tests = testScale
-   % Tests for the normalization functions src/scaleR.m, src/scaleT.m, and
-   % src/scaleA.m on synthetic raw tallies with a small grid: the sums are
+function tests = testCompute
+   % Tests for the normalization functions src/computeReflectance.m,
+   % src/computeTransmittance.m, and src/computeAbsorption.m on synthetic
+   % raw tallies with a small grid: the sums are
    % the packet weights over N, the resolved tallies are the weights over
    % measure and N, the totals add direct and diffuse, and the fluence
    % closes the absorption balance.
@@ -28,20 +29,22 @@ function grid = smallgrid()
    grid.dz = dz*ones(2, 1);
    grid.dA = pi*(redge(2:end).^2 - redge(1:end-1).^2);
    grid.dsr = 2*pi*(cos(aedge(1:end-1)) - cos(aedge(2:end)));
+   grid.N = 10;
 end
 
 function testReflectanceAndTransmittance(testCase)
    % Both functions apply the same rule: sums over N, resolved tallies
    % over measure, projection factor, and N. Rt and Tt add the direct
    % part. With unit weights the squares equal the sums, and every
-   % standard error is tallyse of the raw sum scaled like its output.
+   % standard error is mcstderr of the raw sum scaled like its output.
    grid = smallgrid();
-   N = 10;
+   N = grid.N;
    raw = [1 2; 0 3; 4 0];
    direct = 2;
-   [ra, r, a, df, dr, t, se] = scaleR(raw, direct, raw, direct, grid, N);
-   [tra, tr, ta, tdf, tdr, tt, tse] = scaleT(raw, direct, raw, direct, ...
-      grid, N);
+   [ra, r, a, df, dr, t, se] = computeReflectance(raw, direct, raw, ...
+      direct, grid);
+   [tra, tr, ta, tdf, tdr, tt, tse] = computeTransmittance(raw, direct, ...
+      raw, direct, grid);
    cosa = cos(grid.ai);
    returned = {ra, r, a, df, dr, t, tra, tr, ta, tdf, tdr, tt};
    expected = {raw./(grid.dA.*grid.dsr.*cosa.*N), sum(raw, 1)./(grid.dA*N), ...
@@ -50,11 +53,11 @@ function testReflectanceAndTransmittance(testCase)
    expected = [expected, expected];
    testCase.verifyEqual(returned, expected, 'AbsTol', 1e-15);
    returned = {se.ra, se.r, se.a, se.df, se.dr, se.t, tse};
-   expected = {tallyse(raw, raw, N)./(grid.dA.*grid.dsr.*cosa), ...
-      tallyse(sum(raw, 1), sum(raw, 1), N)./grid.dA, ...
-      tallyse(sum(raw, 2), sum(raw, 2), N)./grid.dsr, ...
-      tallyse(sum(raw(:)), sum(raw(:)), N), tallyse(direct, direct, N), ...
-      tallyse(sum(raw(:)) + direct, sum(raw(:)) + direct, N), se};
+   expected = {mcstderr(raw, raw, N)./(grid.dA.*grid.dsr.*cosa), ...
+      mcstderr(sum(raw, 1), sum(raw, 1), N)./grid.dA, ...
+      mcstderr(sum(raw, 2), sum(raw, 2), N)./grid.dsr, ...
+      mcstderr(sum(raw(:)), sum(raw(:)), N), mcstderr(direct, direct, N), ...
+      mcstderr(sum(raw(:)) + direct, sum(raw(:)) + direct, N), se};
    testCase.verifyEqual(returned, expected, 'AbsTol', 1e-15);
 end
 
@@ -63,11 +66,11 @@ function testAbsorptionAndFluence(testCase)
    % fluence is total absorption over ka, the direct pencil in radial bin
    % 1 only, and ka times the depth integral of phi_z returns Adf + Adr.
    grid = smallgrid();
-   N = 10;
+   N = grid.N;
    ka = 2;
    raw = [1 2; 3 0];
    rawdr = [4; 1];
-   [rz, z, df, drz, prz, pz] = scaleA(raw, rawdr, ka, grid, N);
+   [rz, z, df, drz, prz, pz] = computeAbsorption(raw, rawdr, ka, grid);
    dV = grid.dA.*grid.dz;
    erz = raw./dV/N;
    pencil = rawdr./dV(:, 1)/N;

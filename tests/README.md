@@ -130,17 +130,16 @@ caller's global random stream when the file finishes. `testSetup.m` covers
   written baseline reads back, and the overhead numbers are finite and
   positive. It is not in the fast suite because timing on a loaded laptop
   is not repeatable.
-- `testScale.m`: `scaleR`, `scaleT`, and `scaleA` normalize synthetic raw
-  tallies by measure and N, add direct to diffuse, close the fluence
-  balance on a small grid, and return standard errors through `tallyse`.
-- `testTallySe.m`: `tallyse` on known contributions, and the kernel's
+- `testCompute.m`: `computeReflectance`, `computeTransmittance`, and
+  `computeAbsorption` normalize synthetic raw tallies by measure and N,
+  add direct to diffuse, close the fluence balance on a small grid, and
+  return standard errors through `mcstderr`.
+- `testMcstderr.m`: `mcstderr` on known contributions, and the kernel's
   per-run `RT.se` against the spread of one hundred seeded runs.
-- `testBuildgrid.m`: grid lengths, orientation, optimized centers, and
-  widths for integral inputs; a fractional bin count is refused by name,
-  and whole counts with floating-point error give round(n) bins (K).
-- `testInputValidation.m`: every bad mcrt argument raises `mcrt:input`
-  before the loop, a fractional Z/dz raises `buildgrid:nonintegral`, and
-  the edge values g = -1, g = 1, ks = 0, and a one-bin slab run.
+- `testBuildgrid.m`: grid lengths, orientation, optimized centers, nominal
+  widths and edge-based measures for integral inputs; a fractional bin
+  count is refused by name, whole counts with floating-point error give
+  round(n) bins (K), and the plot option draws four axes.
 
 ## Performance
 

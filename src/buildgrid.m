@@ -1,96 +1,167 @@
-function [ri,ai,zi,dr,da,dz] = buildgrid(R,A,Z,dr,da,dz)
-   %BUILDGRID build grids for scoring observable quantities
+function [grid,ri,ai,zi,dr,da,dz] = buildgrid(R,A,Z,dr,da,dz,makeplot)
+   %BUILDGRID Build grids for scoring observable quantities.
    %
-   % Each extent must be a whole number of bins: R/dr, A/da, and Z/dz are
-   % checked to be integral within 1e-9 relative, and a center the colon
-   % operator drops when the ratio sits a rounding error below the integer
-   % is appended, so the grid has the bins mcrt sizes its tallies with. A
-   % fractional count raises buildgrid:nonintegral.
+   %   [RI,AI,ZI,DR,DA,DZ] = BUILDGRID(R,A,Z,DR,DA,DZ) builds radial,
+   %   angular, and vertical scoring grids from the extents R, A, and Z and
+   %   nominal bin widths DR, DA, and DZ.
+   %
+   %   Each extent must contain a whole number of bins. R/DR, A/DA, and Z/DZ are
+   %   checked to ensure they are whole numbers within a relative tolerance of
+   %   1e-9. The resulting grid therefore has exactly the bin counts used to
+   %   size the tallies with ROUND. Fractional bin counts raise the error
+   %   buildgrid:nonintegral.
+   %
+   %   RI and ZI include one overflow coordinate, one bin width beyond the final
+   %   regular bin. The radial overflow bin pools all values with r > R, so a
+   %   density normalized by its nominal area is not meaningful when substantial
+   %   light exits beyond R.
+   %
+   %   The radial and angular centers are shifted according to Equations 8 and
+   %   14 of Wang et al. 1995 to reduce scoring error. These shifted centers are
+   %   reporting coordinates, not bin measures; bin measures must be computed
+   %   from the bin edges. The optimal vertical reporting coordinate is the
+   %   geometric bin center.
+   %
+   %   Angular coordinates are expressed as theta in radians; mcrt scoring uses
+   %   u = cos(theta).
+   %
+   %   BUILDGRID(...,makeplot=true) plots the original and optimized radial and
+   %   angular grid centers.
+   %
+   %   Example:
+   %      [ri,ai,zi,dr,da,dz] = buildgrid(200,pi/2,100,4,pi/50,5,Plot=true);
+   %
+   % See also:
 
-   % note that U/du are in radians here i.e. theta, but for scoring within the
-   % mcrt program they need to be in u = cos(theta)
+   if nargin < 7
+      makeplot = false;
+   end
 
-   % example:
-   % R           = 200;        % radius of detection [cm]
-   % A           = pi/2;       % angular detection radius
-   % Z           = 100;        % thickness of medium
-   % nr          = 50;         % number of radial bins
-   % na          = 25;         % number of angular bins
-
-   % number of bins in each dimension
-   %     nr      = roundn(R/dr,0);     % radial
-   %     na      = roundn(A/da,0);     % angular
-   %     nz      = roundn(Z/dz,0);     % number
-
-   % every extent is a whole number of bins, or the grid and the tallies
-   % would disagree in length
+   % Each extent must contain a whole number of bins so the grid and tallies
+   % have the same length.
    nr = wholebins(R, dr, 'R/dr');
    na = wholebins(A, da, 'A/da');
    nz = wholebins(Z, dz, 'Z/dz');
 
-   % grid center coordinates, completed to the whole count
+   % Build the grid-center coordinates and complete the expected bin count.
    ri = centers(dr, R, nr);
-   zi = centers(dz, Z, nz);
    ai = centers(da, A, na);
+   zi = centers(dz, Z, nz);
 
-   % r and z need an extra overflow coordinat
-   zi(end+1) = zi(end)+dz;
-   ri(end+1) = ri(end)+dr;
+   % Keep the original bin centers for the comparison plot.
+   if makeplot
+      ri0 = ri;
+      ai0 = ai(:);
+   end
 
-   % optimized to minimize error (https://core.ac.uk/download/pdf/84314628.pdf)
-   ri = ri + (dr*dr/12)./ri;              % Eq. 8
-   ai = ai + cot(ai).*(1-da/2*cot(da/2)); % Eq. 14
-   % the optimal z-coordinate is the center of each element i.e. zi
+   % Add an overflow coordinate to the radial and vertical grids.
+   ri(end+1) = ri(end) + dr;
+   zi(end+1) = zi(end) + dz;
 
-   % make ai and zi columns
+   % Adjust the radial and angular coordinates to minimize scoring error.
+   % https://core.ac.uk/download/pdf/84314628.pdf
+   ri = ri + (dr*dr/12)./ri;               % Equation 8
+   ai = ai + cot(ai).*(1-da/2*cot(da/2));  % Equation 14
+   % The optimal vertical coordinate is the center of each element.
+
+   % Make the angular and vertical coordinates column vectors.
    ai = ai(:);
    zi = zi(:);
 
-   % get new da/dr/dz ('derivative' can be downloaded on the file exchange).
-   % derivative needs two points; a one-bin angular grid keeps its width.
-   if numel(ai) > 1
-      da = derivative(ai);
+   % Compare the bin centers to the optimized coordinates.
+   if makeplot
+      plotgrids(ri0, ri(1:nr), ai0, ai);
    end
-   dr = derivative(ri);
-   dz = derivative(zi);
 
-   % see the difference
-   %     figure;
-   %     tiledlayout(1,2); nexttile;
-   %     plot(dr/2:dr:R-dr/2,'o'); hold on; ylabel('radial grid')
-   %     plot(ri,'o'); legend('grid centers','optimized');
-   %     nexttile;
-   %     plot((dr/2:dr:R-dr/2)-ri,'o'); legend('grid centers - optimized');
-   %
-   %     figure;
-   %     tiledlayout(1,2); nexttile;
-   %     plot(du/2:du:U-du/2,'o'); hold on; ylabel('Angular grid')
-   %     plot(ui,'o'); legend('grid centers','optimized');
-   %     nexttile;
-   %     plot((du/2:du:U-du/2)-ui,'o'); legend('grid centers - optimized');
+   % Assert the grid is formed correctly.
+   assert(numel(ri) == nr+1 && numel(ai) == na && numel(zi) == nz+1, ...
+      'mcrt:grid', 'grid lengths differ from the tally sizes');
+
+   % Compute the bin edges.
+   redge = (0:nr+1)*dr;          % radial edges, overflow included      [cm]
+   aedge = (0:na)'*da;           % angular edges                        [rad]
+
+   % Compute the bin widths.
+   dr = dr*ones(1,nr+1);         % radial widths                        [cm]
+   da = da*ones(na,1);           % angular widths                       [rad]
+   dz = dz*ones(nz+1,1);         % vertical widths, overflow included   [cm]
+
+   % Compute the area of each annulus [cm^2].
+   dA = pi*(redge(2:end).^2-redge(1:end-1).^2);
+
+   % Compute the solid angle of each angular bin [sr].
+   dsr = 2*pi*(cos(aedge(1:end-1))-cos(aedge(2:end)));
+
+   % Assign the grid output struct.
+   grid = struct('ri', ri, 'ai', ai, 'zi', zi, ...
+      'dr', dr, ...
+      'da', da, ...
+      'dz', dz, ...
+      'dA', dA, ...
+      'dsr', dsr);
 end
 
 function c = centers(width, extent, n)
-   % Bin centers from the colon operator, which keeps the values of the
-   % original grid; when a ratio a rounding error below the integer makes
-   % the colon stop one bin short, the last center is appended.
+   %CENTERS Return the bin-center coordinates.
+   %   A rounding error can make the colon operator stop one center short, so
+   %   the final center is appended when needed.
+
    c = width/2:width:extent-width/2;
    if numel(c) < n
-      c(end+1) = (numel(c) + 0.5)*width;
+      c(end+1) = (numel(c) + 0.5) * width;
    end
 end
 
 function n = wholebins(extent, width, name)
-   % The extent divided by the width must be a whole number within 1e-9
-   % relative, which lets 0.02/0.001 pass despite double-precision error
-   % (single precision is not served: its error is about 1e-7). Returns
-   % that whole number, which must be one or more.
-   % a width whose half underflows to zero cannot start a center grid
+   %WHOLEBINS Return the number of whole bins in an extent.
+   %   The extent-to-width ratio must be a positive whole number within a
+   %   relative tolerance of 1e-9.
+
+   % A width whose half underflows to zero cannot define the first grid center.
    assert(width/2 > 0, 'buildgrid:width', ...
       'the bin width for %s is too small for a half-width', name);
+
    ratio = extent/width;
    n = round(ratio);
+
    assert(abs(ratio - n) <= 1e-9*max(1, abs(ratio)) && n >= 1, ...
       'buildgrid:nonintegral', ...
       '%s = %.12g must be a whole number of bins, one or more', name, ratio);
+end
+
+function plotgrids(ri0, ri, ai0, ai)
+   %PLOTGRIDS Compare the original and optimized grid centers.
+
+   % subplot rather than tiledlayout, which Octave lacks
+   figure('Units', 'inches', 'Position', [2 2 10 6])
+
+   subplot(2, 2, 1)
+   plot(1:numel(ri0), ri0, 'o')
+   hold on
+   plot(1:numel(ri), ri, '.')
+   set(gca, 'XScale', 'log', 'YScale', 'log', 'FontSize', 9)
+   xlabel('radial bin')
+   ylabel('r [cm]')
+   legend('bin center', 'optimized (Eq. 8)', 'Location', 'northwest')
+
+   subplot(2, 2, 2)
+   plot(1:numel(ri0), ri - ri0, 'o')
+   set(gca, 'XScale', 'log', 'YScale', 'log', 'FontSize', 9)
+   xlabel('radial bin')
+   ylabel('shift, optimized - center [cm]')
+
+   subplot(2, 2, 3)
+   plot(1:numel(ai0), ai0, 'o')
+   hold on
+   plot(1:numel(ai), ai, '.')
+   set(gca, 'FontSize', 9)
+   xlabel('angular bin')
+   ylabel('\theta [rad]')
+   legend('bin center', 'optimized (Eq. 14)', 'Location', 'northwest')
+
+   subplot(2, 2, 4)
+   plot(1:numel(ai0), ai - ai0, 'o')
+   set(gca, 'YScale', 'log', 'FontSize', 9)
+   xlabel('angular bin')
+   ylabel('shift, optimized - center [rad]')
 end
