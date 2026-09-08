@@ -7,18 +7,15 @@ and the perf measurements of 2026-09-08 (R2025b).
 
 ## Backlog
 
-- **Angular-resolution input.** `mcrt` fixes 30 angular bins over the
-  hemisphere (`da = A/30`); an earlier fork used 100 for its comparisons.
-  A bin-count input is out of the campaign's scope. Reopen when a study
-  needs angular densities finer than 3 degrees; the verdict functions
-  interpolate between bin centers and would need no change.
-- **Roulette threshold input.** `wmin = 1e-4` and `wrr = 10` are fixed
-  in `mcrt`. Roulette is unbiased, so the threshold changes only the
-  variance and the run time. The impact report compared 1e-4 with 1e-5
-  for the van de Hulst case (albedo 0.9), where no packet reached either
-  threshold; the fluence verification case (albedo 0.999, about 11,500
-  steps per packet) was not compared. Reopen with the angular input, as
-  one options argument.
+- **Angular-resolution and roulette inputs: delivered.** `mcrt` takes the
+  name-value options `da`, `R`, `dr`, `wmin`, and `wrr` (owner request,
+  2026-09-08); the defaults are the campaign's values (30 angular bins
+  over the hemisphere, 2 cm at 0.001 cm, 1e-4 and 10). Roulette is
+  unbiased, so the threshold changes only the variance and the run time.
+  The impact report compared 1e-4 with 1e-5 for the van de Hulst case
+  (albedo 0.9), where no packet reached either threshold; the fluence
+  verification case (albedo 0.999, about 11,500 steps per packet) was not
+  compared and is part of bead imcrt-98z.30.
 - **Near-axis direction conditioning.** `chgdir` divides by sin(theta)
   and takes the on-axis branch only below 1e-12, so a direction at a
   polar angle theta between 1e-12 and 1e-6 loses about eps/theta^2 in its

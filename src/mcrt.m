@@ -1,4 +1,4 @@
-function RT = mcrt(ka, ks, g, Z, dz, N)
+function RT = mcrt(ka, ks, g, Z, dz, N, varargin)
    %MCRT Monte Carlo radiative transfer through a plane-parallel slab.
    %
    %  RT = mcrt(ka, ks, g, Z, dz, N) launches N photon packets vertically into a
@@ -24,19 +24,21 @@ function RT = mcrt(ka, ks, g, Z, dz, N)
    %  buildgrid:nonintegral for Z/dz and buildgrid:width for a dz whose
    %  half underflows, before any packet runs.
    %
+   %  RT = mcrt(..., Name, Value) sets an option. wmin (1e-4) is the packet
+   %  weight below which Russian roulette plays and wrr (10) the survival
+   %  odds, 1 in wrr, with the survivor's weight multiplied by wrr. R (2 cm)
+   %  is the radial extent of the tallies, dr (0.001 cm) the radial bin
+   %  width, and da (pi/60 rad) the angular bin width over the hemisphere;
+   %  R/dr and (pi/2)/da must be whole numbers. Every option is a double
+   %  scalar; a bad one or an unknown name raises mcrt:input.
+   %
    % Matt Cooper, guycooper@ucla.edu, Dec 2020
    %
    % See also: buildgrid, binindex, computeReflectance, computeTransmittance,
    % computeAbsorption, mcstderr
 
-   % Check inputs to prevent index errors or silent NaN's inside the main loop.
-   mustbe(isnumber(ka) && ka > 0, 'ka', 'a finite positive scalar');
-   mustbe(isnumber(ks) && ks >= 0, 'ks', 'a finite nonnegative scalar');
-   mustbe(isfinite(ka + ks), 'ka + ks', 'finite');
-   mustbe(isnumber(g) && g >= -1 && g <= 1, 'g', 'a scalar in [-1, 1]');
-   mustbe(isnumber(Z) && Z > 0, 'Z', 'a finite positive scalar');
-   mustbe(isnumber(dz) && dz > 0, 'dz', 'a finite positive scalar');
-   mustbe(isnumber(N) && N >= 1 && N == fix(N), 'N', 'a positive integer');
+   % parse and validate inputs
+   opts = parseinputs(ka, ks, g, Z, dz, N, varargin{:});
 
    % compute optical coefficients
    w = ks/(ka+ks);   % single-scattering albedo          [-]
@@ -46,39 +48,35 @@ function RT = mcrt(ka, ks, g, Z, dz, N)
    % precompute 2*pi
    two_pi = 2*pi;
 
-   % default settings
-   wmin = 1e-4;      % photon weight below which russian roulette plays
-   wrr = 10;         % 1/wrr photons are reinjected (russian roulette)
+   % roulette settings
+   wmin = opts.wmin; % photon weight below which russian roulette plays
+   wrr = opts.wrr;   % 1/wrr photons are reinjected (russian roulette)
 
    % grid settings
-   R = 2;            % cylindrical detection radius          [cm]
+   R = opts.R;       % cylindrical detection radius          [cm]
    A = pi/2;         % angular detection radius              [rad]
-   dr = 0.001;       % radial bin width                      [cm]
-   da = A/30;        % angular bin width                     [rad]
-   nr = round(R/dr); % radial
-   na = round(A/da); % angular
-   nz = round(Z/dz); % vertical
+   dr = opts.dr;     % radial bin width                      [cm]
+   da = opts.da;     % angular bin width                     [rad]
+   nr = opts.nr;     % radial
+   na = opts.na;     % angular
+   nz = opts.nz;     % vertical
 
-   % Build a grid to calculate observable quantities (eq. 4.1/4.2 Wang). It
-   % is built before the loop so a fractional Z/dz fails before any packet
-   % runs and the random stream is untouched. The packet count joins the
-   % grid so every consumer of the tallies reads one struct.
-   grid = buildgrid(R, A, Z, dr, da, dz);
-   grid.N = N;
+   % build a grid to calculate observable quantities (eq. 4.1/4.2 Wang)
+   grid = buildgrid(R, A, Z, dr, da, dz, N);
 
    % initialize output grids with +1 for overflow
-   Adf_rz = zeros(nz+1,nr+1); % absorption, diffuse
-   Adr_z = zeros(nz+1,1);     % absorption, direct
-   Tdf_ra = zeros(na,nr+1);   % transmittance, diffuse
-   Rdf_ra = zeros(na,nr+1);   % reflectance, diffuse
-   Tdr = 0;                   % transmittance, direct (unscattered)
    Rdr = 0;                   % reflectance, direct (unscattered)
+   Tdr = 0;                   % transmittance, direct (unscattered)
+   Adr_z  = zeros(nz+1,1);    % absorption, direct
+   Rdf_ra = zeros(na,nr+1);   % reflectance, diffuse
+   Tdf_ra = zeros(na,nr+1);   % transmittance, diffuse
+   Adf_rz = zeros(nz+1,nr+1); % absorption, diffuse
 
    % squared weights of the exit tallies, for their standard errors
-   Tdf_ss = zeros(na,nr+1);
    Rdf_ss = zeros(na,nr+1);
-   Tdr_ss = 0;
+   Tdf_ss = zeros(na,nr+1);
    Rdr_ss = 0;
+   Tdr_ss = 0;
 
    % monte carlo
    for n = 1:N
@@ -105,7 +103,7 @@ function RT = mcrt(ka, ks, g, Z, dz, N)
          % clamps catch r=0 and z=0, which ceil maps to bin 0. binindex does the
          % same but two calls per step measured 10-13% of the loop (tests/perf),
          % so these two are inlined and binindex is used for the exit angle
-         % below, which clamps the angular index to acos(1) = 0 on axis.
+         % below, which clamps the angular index to acos(1) = 0 on-axis.
          if ir<1; ir = 1; end         % radial on-axis
          if iz<1; iz = 1; end         % vertical at the surface
 
@@ -158,19 +156,18 @@ function RT = mcrt(ka, ks, g, Z, dz, N)
          [ux,uy,uz] = chgdir(ux,uy,uz,us,ps);
 
          % russian roulette below wmin: the packet survives with wrr times
-         % its weight or dies. A survivor can still sit below wmin, so the
-         % loop runs on wt > 0 and it plays again on the next step.
+         % its weight or dies. A packet can survive below wmin, since the
+         % loop runs on wt > 0 it plays again on the next step.
          if wt < wmin
             wt = roulette(wt, wrr);
          end
       end
    end
 
-   % Convert the photon counts to SI units (Wang et al. 1995, Sect. 4):
+   % convert the photon counts to SI units (Wang et al. 1995, Sect. 4).
    % computeReflectance and computeTransmittance sum the tallies and divide by
-   % the bin measures and N; computeAbsorption does the same for absorption
-   % and computes fluence. The squared weights give each exit output its
-   % standard error.
+   % the bin measures and N; computeAbsorption does the same and computes
+   % fluence; standard errors are computed from the squared weights.
    [Rdf_ra, Rdf_r, Rdf_a, Rdf, Rdr, Rt, seR] = computeReflectance( ...
       Rdf_ra, Rdr, Rdf_ss, Rdr_ss, grid);
 
@@ -212,14 +209,61 @@ function RT = mcrt(ka, ks, g, Z, dz, N)
 
 end
 
-function tf = isnumber(x)
-   % A finite real double scalar. Integer classes are refused because
-   % their arithmetic saturates; single is refused because buildgrid's
-   % whole-bin tolerance is set for double precision.
-   tf = isa(x, 'double') && isscalar(x) && isreal(x) && isfinite(x);
-end
+function opts = parseinputs(ka, ks, g, Z, dz, N, varargin)
+   %PARSEINPUTS Validate the required inputs and parse the options.
+   %
+   %  opts = parseinputs(ka, ks, g, Z, dz, N, Name, Value, ...) checks the
+   %  required inputs and the options wmin, wrr, R, dr, and da through an
+   %  inputParser whose validators are validateattributes calls, fills the
+   %  options with their defaults, and returns them in opts with the whole
+   %  bin counts nr, na, and nz. Every failure, including an unknown option
+   %  name, raises mcrt:input with the parser's message; a fractional bin
+   %  count raises buildgrid:nonintegral from wholebins, the same rule
+   %  buildgrid applies.
+   double = {'double'};
+   scalar = {'scalar', 'real', 'finite'};
+   p = inputParser;
+   p.FunctionName = 'mcrt';
+   % a misspelled option must fail, not match a unique prefix
+   p.PartialMatching = false;
+   addRequired(p, 'ka', @(x) validateattributes(x, double, ...
+      [scalar, {'positive'}], 'mcrt', 'ka'));
+   addRequired(p, 'ks', @(x) validateattributes(x, double, ...
+      [scalar, {'nonnegative'}], 'mcrt', 'ks'));
+   addRequired(p, 'g', @(x) validateattributes(x, double, ...
+      [scalar, {'>=', -1, '<=', 1}], 'mcrt', 'g'));
+   addRequired(p, 'Z', @(x) validateattributes(x, double, ...
+      [scalar, {'positive'}], 'mcrt', 'Z'));
+   addRequired(p, 'dz', @(x) validateattributes(x, double, ...
+      [scalar, {'positive'}], 'mcrt', 'dz'));
+   addRequired(p, 'N', @(x) validateattributes(x, double, ...
+      [scalar, {'integer', 'positive'}], 'mcrt', 'N'));
+   addParameter(p, 'wmin', 1e-4, @(x) validateattributes(x, double, ...
+      [scalar, {'>', 0, '<', 1}], 'mcrt', 'wmin'));
+   addParameter(p, 'wrr', 10, @(x) validateattributes(x, double, ...
+      [scalar, {'>', 1}], 'mcrt', 'wrr'));
+   addParameter(p, 'R', 2, @(x) validateattributes(x, double, ...
+      [scalar, {'positive'}], 'mcrt', 'R'));
+   addParameter(p, 'dr', 0.001, @(x) validateattributes(x, double, ...
+      [scalar, {'positive'}], 'mcrt', 'dr'));
+   addParameter(p, 'da', pi/60, @(x) validateattributes(x, double, ...
+      [scalar, {'>', 0, '<=', pi/2}], 'mcrt', 'da'));
+   % one identifier for every bad input; the parser's message names it
+   try
+      parse(p, ka, ks, g, Z, dz, N, varargin{:});
+   catch cause
+      error('mcrt:input', '%s', cause.message);
+   end
+   opts = p.Results;
 
-function mustbe(cond, name, what)
-   % Raise mcrt:input naming the argument when its check fails.
-   assert(cond, 'mcrt:input', '%s must be %s', name, what);
+   % two finite coefficients can overflow when added
+   if ~isfinite(ka + ks)
+      error('mcrt:input', 'ka + ks must be finite');
+   end
+
+   % every extent must hold a whole number of bins, checked here so the
+   % failure comes before any packet runs
+   opts.nr = wholebins(opts.R, opts.dr, 'R/dr');
+   opts.na = wholebins(pi/2, opts.da, 'A/da');
+   opts.nz = wholebins(Z, dz, 'Z/dz');
 end

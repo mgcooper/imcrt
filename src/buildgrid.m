@@ -1,4 +1,4 @@
-function [grid,ri,ai,zi,dr,da,dz] = buildgrid(R,A,Z,dr,da,dz,makeplot)
+function [grid,ri,ai,zi,dr,da,dz] = buildgrid(R,A,Z,dr,da,dz,N,makeplot)
    %BUILDGRID Build grids for scoring observable quantities.
    %
    %   [RI,AI,ZI,DR,DA,DZ] = BUILDGRID(R,A,Z,DR,DA,DZ) builds radial,
@@ -33,8 +33,10 @@ function [grid,ri,ai,zi,dr,da,dz] = buildgrid(R,A,Z,dr,da,dz,makeplot)
    %
    % See also:
 
-   if nargin < 7
+   if nargin < 8
       makeplot = false;
+   else
+      assert(islogical(makeplot))
    end
 
    % Each extent must contain a whole number of bins so the grid and tallies
@@ -73,10 +75,6 @@ function [grid,ri,ai,zi,dr,da,dz] = buildgrid(R,A,Z,dr,da,dz,makeplot)
       plotgrids(ri0, ri(1:nr), ai0, ai);
    end
 
-   % Assert the grid is formed correctly.
-   assert(numel(ri) == nr+1 && numel(ai) == na && numel(zi) == nz+1, ...
-      'mcrt:grid', 'grid lengths differ from the tally sizes');
-
    % Compute the bin edges.
    redge = (0:nr+1)*dr;          % radial edges, overflow included      [cm]
    aedge = (0:na)'*da;           % angular edges                        [rad]
@@ -98,7 +96,8 @@ function [grid,ri,ai,zi,dr,da,dz] = buildgrid(R,A,Z,dr,da,dz,makeplot)
       'da', da, ...
       'dz', dz, ...
       'dA', dA, ...
-      'dsr', dsr);
+      'dsr', dsr, ...
+      'N', N);
 end
 
 function c = centers(width, extent, n)
@@ -112,23 +111,6 @@ function c = centers(width, extent, n)
    end
 end
 
-function n = wholebins(extent, width, name)
-   %WHOLEBINS Return the number of whole bins in an extent.
-   %   The extent-to-width ratio must be a positive whole number within a
-   %   relative tolerance of 1e-9.
-
-   % A width whose half underflows to zero cannot define the first grid center.
-   assert(width/2 > 0, 'buildgrid:width', ...
-      'the bin width for %s is too small for a half-width', name);
-
-   ratio = extent/width;
-   n = round(ratio);
-
-   assert(abs(ratio - n) <= 1e-9*max(1, abs(ratio)) && n >= 1, ...
-      'buildgrid:nonintegral', ...
-      '%s = %.12g must be a whole number of bins, one or more', name, ratio);
-end
-
 function plotgrids(ri0, ri, ai0, ai)
    %PLOTGRIDS Compare the original and optimized grid centers.
 
@@ -139,14 +121,14 @@ function plotgrids(ri0, ri, ai0, ai)
    plot(1:numel(ri0), ri0, 'o')
    hold on
    plot(1:numel(ri), ri, '.')
-   set(gca, 'XScale', 'log', 'YScale', 'log', 'FontSize', 9)
+   set(gca, 'XScale', 'log', 'YScale', 'log', 'FontSize', 11)
    xlabel('radial bin')
    ylabel('r [cm]')
    legend('bin center', 'optimized (Eq. 8)', 'Location', 'northwest')
 
    subplot(2, 2, 2)
    plot(1:numel(ri0), ri - ri0, 'o')
-   set(gca, 'XScale', 'log', 'YScale', 'log', 'FontSize', 9)
+   set(gca, 'XScale', 'log', 'YScale', 'log', 'FontSize', 11)
    xlabel('radial bin')
    ylabel('shift, optimized - center [cm]')
 
@@ -154,14 +136,14 @@ function plotgrids(ri0, ri, ai0, ai)
    plot(1:numel(ai0), ai0, 'o')
    hold on
    plot(1:numel(ai), ai, '.')
-   set(gca, 'FontSize', 9)
+   set(gca, 'FontSize', 11)
    xlabel('angular bin')
    ylabel('\theta [rad]')
    legend('bin center', 'optimized (Eq. 14)', 'Location', 'northwest')
 
    subplot(2, 2, 4)
    plot(1:numel(ai0), ai - ai0, 'o')
-   set(gca, 'YScale', 'log', 'FontSize', 9)
+   set(gca, 'YScale', 'log', 'FontSize', 11)
    xlabel('angular bin')
    ylabel('shift, optimized - center [rad]')
 end

@@ -16,7 +16,7 @@ function testIntegralLengthsAndOrientation(testCase)
    % r and z carry one overflow bin and a does not. r is a row; a and z
    % are columns, which the kernel's broadcasting relies on.
    [~, ri, ai, zi, dr, da, dz] = buildgrid(2, pi/2, 0.02, 0.001, pi/60, ...
-      0.001);
+      0.001, 100);
    returned = {size(ri), size(ai), size(zi), size(dr), size(da), size(dz)};
    expected = {[1 2001], [30 1], [21 1], [1 2001], [30 1], [21 1]};
    testCase.verifyEqual(returned, expected);
@@ -32,7 +32,7 @@ function testOptimizedCenters(testCase)
    dr = 0.001;
    da = A/30;
    dz = 0.001;
-   [~, ri, ai, zi] = buildgrid(R, A, Z, dr, da, dz);
+   [~, ri, ai, zi] = buildgrid(R, A, Z, dr, da, dz, 100);
    rc = [dr/2:dr:R-dr/2, R+dr/2];
    ac = (da/2:da:A-da/2)';
    returned = ri;
@@ -54,11 +54,13 @@ function testWidthsAndMeasures(testCase)
    % hemisphere.
    R = 2;
    Z = 0.02;
-   [grid, ~, ~, ~, dr, da, dz] = buildgrid(R, pi/2, Z, 0.001, pi/60, 0.001);
+   [grid, ~, ~, ~, dr, da, dz] = buildgrid(R, pi/2, Z, 0.001, pi/60, ...
+      0.001, 100);
    returned = {dr, da, dz, sum(grid.dA(1:end-1)), sum(grid.dsr), ...
-      sum(dz(1:end-1)), sort(fieldnames(grid))};
+      sum(dz(1:end-1)), sort(fieldnames(grid)), grid.N};
    expected = {0.001*ones(1, 2001), pi/60*ones(30, 1), 0.001*ones(21, 1), ...
-      pi*R^2, 2*pi, Z, sort({'ri'; 'ai'; 'zi'; 'dr'; 'da'; 'dz'; 'dA'; 'dsr'})};
+      pi*R^2, 2*pi, Z, ...
+      sort({'ri'; 'ai'; 'zi'; 'dr'; 'da'; 'dz'; 'dA'; 'dsr'; 'N'}), 100};
    testCase.verifyEqual(returned, expected, 'RelTol', 1e-12);
 end
 
@@ -72,20 +74,21 @@ function testFractionalCountsAreRejected(testCase)
    dr = 0.01;
    da = pi/7;
    dz = 0.01;
-   testCase.verifyError(@() buildgrid(R, A, 0.02, dr, pi/6, 0.01), ...
+   testCase.verifyError(@() buildgrid(R, A, 0.02, dr, pi/6, 0.01, 100), ...
       'buildgrid:nonintegral');
-   testCase.verifyError(@() buildgrid(0.02, A, 0.02, dr, da, 0.01), ...
+   testCase.verifyError(@() buildgrid(0.02, A, 0.02, dr, da, 0.01, 100), ...
       'buildgrid:nonintegral');
-   testCase.verifyError(@() buildgrid(0.02, A, Z, dr, pi/6, dz), ...
+   testCase.verifyError(@() buildgrid(0.02, A, Z, dr, pi/6, dz, 100), ...
       'buildgrid:nonintegral');
    % An extent below one bin is a fractional count too, and a ratio that
    % rounds to zero within the tolerance fails the one-or-more bound.
-   testCase.verifyError(@() buildgrid(0.02, A, 0.005, dr, pi/6, 0.01), ...
+   testCase.verifyError(@() buildgrid(0.02, A, 0.005, dr, pi/6, 0.01, 100), ...
       'buildgrid:nonintegral');
-   testCase.verifyError(@() buildgrid(0.02, A, 1e-12, dr, pi/6, 1), ...
+   testCase.verifyError(@() buildgrid(0.02, A, 1e-12, dr, pi/6, 1, 100), ...
       'buildgrid:nonintegral');
    % A width whose half underflows cannot start a grid.
-   testCase.verifyError(@() buildgrid(0.02, A, eps(0), dr, pi/6, eps(0)), ...
+   testCase.verifyError(@() buildgrid(0.02, A, eps(0), dr, pi/6, eps(0), ...
+      100), ...
       'buildgrid:width');
 end
 
@@ -94,12 +97,13 @@ function testWholeCountsWithRoundoff(testCase)
    % 0.02/0.001 and 0.1/0.005, and a ratio 1e-10 relative below a whole
    % number, pass the check and give round(n) bins, the sizes mcrt uses
    % for its tallies.
-   [~, ri, ~, zi] = buildgrid(2, pi/2, 0.02, 0.001, pi/60, 0.001);
-   [~, ri2, ~, zi2] = buildgrid(0.1, pi/2, 0.1, 0.005, pi/60, 0.005);
-   [~, ~, ~, zi3] = buildgrid(0.1, pi/2, 20*(1 - 1e-10), 0.005, pi/60, 1);
+   [~, ri, ~, zi] = buildgrid(2, pi/2, 0.02, 0.001, pi/60, 0.001, 100);
+   [~, ri2, ~, zi2] = buildgrid(0.1, pi/2, 0.1, 0.005, pi/60, 0.005, 100);
+   [~, ~, ~, zi3] = buildgrid(0.1, pi/2, 20*(1 - 1e-10), 0.005, pi/60, 1, ...
+      100);
    % one bin a rounding error short: the colon is empty and the center
    % is built directly
-   [~, ~, ~, zi4] = buildgrid(0.1, pi/2, 1 - 1e-10, 0.005, pi/60, 1);
+   [~, ~, ~, zi4] = buildgrid(0.1, pi/2, 1 - 1e-10, 0.005, pi/60, 1, 100);
    returned = {numel(ri), numel(zi), numel(ri2), numel(zi2), numel(zi3), ...
       zi4};
    expected = {2001, 21, 21, 21, 21, [0.5; 1.5]};
@@ -109,7 +113,7 @@ end
 function testOneAngularBin(testCase)
    % A single angular bin (A = da) is allowed: its center is the shifted
    % half-width and its width is the input width.
-   [~, ~, ai, ~, ~, da] = buildgrid(0.02, pi/2, 0.02, 0.001, pi/2, 0.001);
+   [~, ~, ai, ~, ~, da] = buildgrid(0.02, pi/2, 0.02, 0.001, pi/2, 0.001, 100);
    ac = pi/4;
    returned = {numel(ai), ai, da};
    expected = {1, ac + cot(ac)*(1 - pi/4*cot(pi/4)), pi/2};
@@ -121,7 +125,7 @@ function testPlotOption(testCase)
    % coordinates: one new figure with four axes, and only that figure is
    % closed afterward.
    before = findall(0, 'Type', 'figure');
-   buildgrid(0.02, pi/2, 0.02, 0.001, pi/60, 0.001, true);
+   buildgrid(0.02, pi/2, 0.02, 0.001, pi/60, 0.001, 100, true);
    after = findall(0, 'Type', 'figure');
    new = setdiff(after, before);
    testCase.addTeardown(@() close(new));
