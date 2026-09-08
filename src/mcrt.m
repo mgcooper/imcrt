@@ -56,7 +56,9 @@ function RT = mcrt(ka,ks,g,Z,dz,N)
    % before the loop so a fractional Z/dz fails before any packet runs.
    % buildgrid's shifted centers are reporting coordinates (Eqs. 8 and 14
    % of the paper it cites), not bin measures, so the measures come from
-   % the bin edges instead. Each overflow bin takes one more bin width.
+   % the bin edges instead. Each overflow bin takes one more bin width;
+   % the radial one pools every r > R, so its per-area density is
+   % meaningless when much light leaves past R (docs/dispositions.md).
    % The tallies are sized with round(); buildgrid checked that every
    % count is whole, so the grid must have exactly those bins.
    [ri,ai,zi] = buildgrid(R,A,Z,dr,da,dz);

@@ -37,6 +37,8 @@ The commit before the first correction carries the tag `cooper2021-as-published`
 - `fix-N-roulette`: a roulette survivor still below the threshold was dropped instead of playing again. Nothing changes at albedo 0.1 and above. Below it, an affected survivor loses its remaining weight, which is less than the threshold. The measured bias at albedo 0.05 is about 6e-6 per launched packet.
 - `fix-S-bin-measures`: the solid angle and annulus area of each bin came from the shifted reporting coordinates. That overstated the first bin's measure by 18.5 percent. The first angular and radial densities rise by 18.5 percent and the second fall by 3 percent; every hemispherical sum is unchanged. This one predates the paper, which reported no resolved densities.
 
+Known limitations and deferred items are listed with their reasons in `docs/dispositions.md`.
+
 ## How do I cite this?
 
 If you find this model useful, please consider citing the software release (see `CITATION.cff`), and/or the following paper:
