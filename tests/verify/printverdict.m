@@ -2,7 +2,7 @@ function npass = printverdict(V, fid)
    % Print a verdict struct (see vdhverdict) as a fixed-width table with
    % fprintf, which runs on core Octave as well as MATLAB. Return the
    % number of rows that pass. The optional fid sends the table to an open
-   % file instead of the screen, for the overnight report.
+   % file instead of the screen, for the report file of vdhverify.
    if nargin < 2
       fid = 1;
    end

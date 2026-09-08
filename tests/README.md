@@ -76,7 +76,7 @@ caller's global random stream when the file finishes. `testSetup.m` covers
   fluence case (energy, ten direct-beam depth bins, surface fluence).
 - `verify/printverdict.m`: prints a verdict struct with `fprintf` and
   returns the number of passing rows.
-- `verify/vdhovernight.m`: the multi-run driver (MATLAB only). It runs
+- `verify/vdhverify.m`: the multi-run driver (MATLAB only). It runs
   both cases at the full sizes in `verifycases.m` and checkpoints every
   run to a `.mat` file with the kernel hash, version, inputs, and run
   time. The fluence report includes the phi_z depth profile. It
@@ -109,7 +109,7 @@ caller's global random stream when the file finishes. `testSetup.m` covers
   report generator at a tiny size.
 - `verify/reportname.m`: a dated report path that takes a numeric suffix
   when the name is taken, so no report is ever overwritten.
-- `testOvernight.m`: the driver at scale 1e-3. It checks that the driver:
+- `testVdhverify.m`: the driver at scale 1e-3. It checks that the driver:
   - creates the output folder and writes 36 checkpoints and a report;
   - resumes from the checkpoints and recomputes stale or unreadable ones;
   - keeps every report and reaches OVERALL FAIL with tmax = 0;

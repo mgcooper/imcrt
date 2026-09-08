@@ -1,5 +1,5 @@
-function tests = testOvernight
-   % Tests for vdhovernight at a tiny scale. It must create the output
+function tests = testVdhverify
+   % Tests for vdhverify at a tiny scale. It must create the output
    % folder, write one checkpoint per run and a dated report, resume from
    % matching checkpoints, recompute stale or incomplete ones, keep every
    % report, and reach OVERALL FAIL when the t cutoff is zero.
@@ -40,10 +40,10 @@ function testReportFailurePaths(testCase)
    mkdir(locked);
    fileattrib(locked, '-w');
    testCase.addTeardown(@() fileattrib(locked, '+w'));
-   testCase.verifyError(@() vdhovernight(locked, 1e-3), ...
-      'vdhovernight:report');
+   testCase.verifyError(@() vdhverify(locked, 1e-3), ...
+      'vdhverify:report');
    outdir = fullfile(folder.Folder, 'broken');
-   evalc('vdhovernight(outdir, 1e-3)');
+   evalc('vdhverify(outdir, 1e-3)');
    files = dir(fullfile(outdir, 'checkpoint_reflect_*.mat'));
    ck = fullfile(outdir, files(1).name);
    S = load(ck);
@@ -51,7 +51,7 @@ function testReportFailurePaths(testCase)
    meta = S.meta;
    save(ck, 'RT', 'meta');
    nopen = numel(openedFiles);
-   testCase.verifyError(@() evalc('vdhovernight(outdir, 1e-3)'), ...
+   testCase.verifyError(@() evalc('vdhverify(outdir, 1e-3)'), ...
       ?MException);
    returned = numel(openedFiles);
    expected = nopen;
@@ -64,7 +64,7 @@ function testCheckpointsResumeAndVerdicts(testCase)
    folder = testCase.applyFixture( ...
       matlab.unittest.fixtures.TemporaryFolderFixture);
    outdir = fullfile(folder.Folder, 'nightly');
-   [out, reportfile] = evalc('vdhovernight(outdir, 1e-3)');
+   [out, reportfile] = evalc('vdhverify(outdir, 1e-3)');
    files = dir(fullfile(outdir, 'checkpoint_*.mat'));
    tmpfiles = dir(fullfile(outdir, '*_tmp.mat'));
    text = fileread(reportfile);
@@ -75,7 +75,7 @@ function testCheckpointsResumeAndVerdicts(testCase)
    expected = {36, 0, 2, true, true, true, true, true};
    testCase.verifyEqual(returned, expected, out(max(1, end-400):end));
    % A second call loads every checkpoint and still reports run times.
-   [out, reportfile] = evalc('vdhovernight(outdir, 1e-3)');
+   [out, reportfile] = evalc('vdhverify(outdir, 1e-3)');
    returned = {numel(strfind(out, 'loaded')), ...
       isempty(regexp(fileread(reportfile), 'over all runs at scale', 'once'))};
    expected = {36, false};
@@ -87,7 +87,7 @@ function testCheckpointsResumeAndVerdicts(testCase)
    meta.kernel = 'stale';
    RT = S.RT;
    save(ck, 'RT', 'meta');
-   out = evalc('vdhovernight(outdir, 1e-3)');
+   out = evalc('vdhverify(outdir, 1e-3)');
    returned = {numel(strfind(out, 'stale checkpoint')), ...
       numel(strfind(out, 'loaded'))};
    expected = {1, 35};
@@ -108,7 +108,7 @@ function testCheckpointsResumeAndVerdicts(testCase)
    for n = 1:numel(broken)
       T = broken{n}(good);
       save(ck, '-struct', 'T');
-      out = evalc('vdhovernight(string(outdir), 1e-3)');
+      out = evalc('vdhverify(string(outdir), 1e-3)');
       returned = numel(strfind(out, 'stale checkpoint'));
       expected = 1;
       testCase.verifyEqual(returned, expected, sprintf('corruption %d', n));
@@ -117,15 +117,15 @@ function testCheckpointsResumeAndVerdicts(testCase)
    fid = fopen(ck, 'w');
    fprintf(fid, 'not a MAT-file');
    fclose(fid);
-   out = evalc('vdhovernight(outdir, 1e-3)');
+   out = evalc('vdhverify(outdir, 1e-3)');
    returned = numel(strfind(out, 'stale checkpoint'));
    expected = 1;
    testCase.verifyEqual(returned, expected);
    % tmax = 0 fails every statistical row without an allowance, so the
    % report ends in OVERALL FAIL. Two reports in one second get distinct
    % names.
-   [out, first] = evalc('vdhovernight(outdir, 1e-3, 0)');
-   [~, second] = evalc('vdhovernight(outdir, 1e-3, 0)');
+   [out, first] = evalc('vdhverify(outdir, 1e-3, 0)');
+   [~, second] = evalc('vdhverify(outdir, 1e-3, 0)');
    returned = {contains(out, 'OVERALL FAIL'), strcmp(first, second), ...
       exist(first, 'file') == 2 && exist(second, 'file') == 2};
    expected = {true, false, true};

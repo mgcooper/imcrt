@@ -16,8 +16,8 @@ Run `Setup.m`. If running in Octave, check `.octaverc`.
 
 Run `mcrt_verify` to verify model accuracy. It runs one case at a time as a set of seeded simulations (8 for `reflect`, 4 for `fluence`), compares the model output with tabulated solutions to the transfer equation, and prints a PASS/FAIL table. The `reflect` case compares hemispherical and angular reflectance and transmittance with van de Hulst's tabulated solutions (Vol. 2, Table 35). The `fluence` case runs the internal-fluence problem from Wang et al. (1995) with self-consistency checks, since no numeric reference is in the repository. Call `mcrt_verify('fluence')` to pick a case; the default is `reflect`, and the function returns the verdict table and the runs. For the full multi-run check, run the driver from the repo root (MATLAB only: it uses `datetime` and the JVM's SHA-256). Run the dry run at `scale = 1e-2` first. The driver checkpoints every run and writes a dated PASS/FAIL report under `verify_out/`:
 
-    Setup; addpath('tests/verify'); vdhovernight('verify_out', 1e-2)
-    Setup; addpath('tests/verify'); vdhovernight('verify_out')
+    Setup; addpath('tests/verify'); vdhverify('verify_out', 1e-2)
+    Setup; addpath('tests/verify'); vdhverify('verify_out')
 
 The cases are in `tests/verify/verifycases.m`. To add a case, add an entry there, add a verdict function for its reference, and add a branch to `mcrt_verify`.
 

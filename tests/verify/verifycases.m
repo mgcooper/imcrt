@@ -3,7 +3,7 @@ function c = verifycases(casename)
    % name. Each case carries the kernel inputs, the interactive run
    % count M, the packets N, the seeds, and tmax. M and N are sized for
    % seconds on a laptop. tmax is the run-spread t cutoff for a PASS. The
-   % full field holds the same four values for vdhovernight: 1e8
+   % full field holds the same four values for vdhverify: 1e8
    % packets for reflect and 1e6 for fluence. reflect uses the DesignSpec
    % cutoff of 3 standard errors over 20 runs (0.7% false-fail per row at
    % 19 degrees of freedom; Rd, Tt, and the angular rows also carry the

@@ -1,8 +1,8 @@
-function reportfile = vdhovernight(outdir, scale, tmax)
-   %VDHOVERNIGHT Multi-run verification of mcrt with checkpoints and a
+function reportfile = vdhverify(outdir, scale, tmax)
+   %VDHVERIFY Multi-run verification of mcrt with checkpoints and a
    % dated PASS/FAIL report.
    %
-   %  reportfile = vdhovernight(outdir) runs case reflect (van de Hulst
+   %  reportfile = vdhverify(outdir) runs case reflect (van de Hulst
    %  Table 35) and case fluence (self-consistency) at the full sizes in
    %  verifycases, M independent seeded runs each. It saves every run to
    %  outdir/checkpoint_<case>_N<N>_seed<s>.mat as it completes and writes
@@ -23,11 +23,11 @@ function reportfile = vdhovernight(outdir, scale, tmax)
    %  to a temporary name and renamed, so a stop during save leaves no
    %  half-written checkpoint behind.
    %
-   %  vdhovernight(outdir, scale) multiplies every N by scale. Run
+   %  vdhverify(outdir, scale) multiplies every N by scale. Run
    %  scale = 1e-2 first as the mandatory dry run. It exercises every step
    %  in seconds and prints the runtime estimate for scale = 1. The N in a
    %  checkpoint name keeps dry-run files apart from full-run files.
-   %  vdhovernight(outdir, scale, tmax) replaces every case's t cutoff;
+   %  vdhverify(outdir, scale, tmax) replaces every case's t cutoff;
    %  the tests use tmax = 0 to reach the OVERALL FAIL path.
    %
    %  Verdict rules. A statistical row passes when |t| <= tmax with M - 1
@@ -63,12 +63,12 @@ function reportfile = vdhovernight(outdir, scale, tmax)
       char(datetime('now', 'Format', 'yyyyMMdd_HHmmss')));
    fid = fopen(reportfile, 'w');
    if fid < 0
-      error('vdhovernight:report', 'Cannot open %s', reportfile);
+      error('vdhverify:report', 'Cannot open %s', reportfile);
    end
    % An interrupt or an error in a run must not leave the report open and
    % unflushed; the cleanup closes it if the normal fclose is skipped.
    cleaner = onCleanup(@() closeifopen(fid));
-   fprintf(fid, 'imcrt overnight verification, %s\nMATLAB %s\n', ...
+   fprintf(fid, 'imcrt full verification, %s\nMATLAB %s\n', ...
       char(datetime('now')), version);
    fprintf(fid, 'kernel sha256 %s of %s\n', kernel, ...
       strjoin(kernelfiles(), '+'));

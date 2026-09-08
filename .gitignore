@@ -47,5 +47,5 @@ codegen/
 **/resources/*
 !**/resources/project/
 
-# Overnight verification checkpoints and reports (vdhovernight)
+# Full verification checkpoints and reports (vdhverify)
 /verify_out/
