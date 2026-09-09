@@ -1,20 +1,26 @@
 function [V, RTs] = mcrt_verify(casename)
-   %MCRT_VERIFY Verify src/mcrt.m against its published references and print
+   %MCRT_VERIFY Verify mcrt.m against its published references and print
    % a tolerance-based PASS/FAIL table.
    %
    % [V, RTs] = mcrt_verify(casename) runs one case and returns its verdict
    % table V and the M runs RTs. casename defaults to 'reflect':
+   %
    %   'reflect'  van de Hulst (1980) Vol. 2, p. 435, Table 35. It checks the
    %              hemispherical and angular reflectance and transmittance of
    %              a tau = 2 slab (albedo 0.9, g = 0.75). Every row must pass.
    %   'fluence'  Wang et al. (1995) Fig. 4: internal fluence at albedo 0.999.
    %              No numeric reference exists in this repository, so the table
    %              holds self-consistency checks only.
+   %
    % Each case runs standalone. Its run count, packets, and seeds come from
    % tests/verify/verifycases.m and are sized for seconds on a laptop. Larger
    % runs use the same case table and verdict functions. To add a case, add
    % an entry to verifycases.m. Add a verdict function for its reference.
    % Add a branch to each switch block below.
+   %
+   % See also: mcrt, vdhverify
+
+
    if nargin < 1 || isempty(casename)
       casename = 'reflect';
    end

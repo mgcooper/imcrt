@@ -1,6 +1,6 @@
 function se = mcstderr(ss, s, N)
    %MCSTDERR Compute the standard error of a Monte Carlo tally.
-   % 
+   %
    %   SE = MCSTDERR(SS,S,N) computes the standard error of the mean tally
    %   per packet from S, the sum of packet contributions, SS, the sum of
    %   squared packet contributions, and N, the number of packets:

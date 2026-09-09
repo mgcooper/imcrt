@@ -6,7 +6,7 @@ function i = binindex(v, d, n)
    %
    %   V = 0 is assigned to the first bin. Values that round beyond the
    %   final edge are assigned to bin N. If N includes an overflow bin,
-   %   these values are assigned to that overflow bin.
+   %   overflow values are assigned to the overflow bin.
 
    i = ceil(v/d);
 
