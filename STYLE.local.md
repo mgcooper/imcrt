@@ -1,6 +1,6 @@
 # Project-specific code style — imcrt
 
-This file extends canonical `STYLE.md`.
+This file extends `STYLE.md`.
 
 ## Naming
 
