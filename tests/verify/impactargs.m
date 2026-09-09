@@ -3,7 +3,7 @@ function [reportfile, N, M] = impactargs(reportfile, N, M)
    % documented value. The defaults live apart from the generator so a
    % test can check them without a report run at the default N.
    if nargin < 1 || isempty(reportfile)
-      reportfile = 'docs/impact-report.md';
+      reportfile = 'tests/reports/impact-report.md';
    end
    if nargin < 2 || isempty(N)
       N = 1e5;

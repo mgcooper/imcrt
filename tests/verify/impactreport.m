@@ -3,7 +3,7 @@ function reportfile = impactreport(varargin)
    %
    %  impactreport(reportfile, N, M) writes a Markdown report with two
    %  sections and returns its path. Defaults (impactargs): reportfile
-   %  docs/impact-report.md, N 1e5 packets, M 8 runs.
+   %  tests/reports/impact-report.md, N 1e5 packets, M 8 runs.
    %
    %  Section 1, impact. The cases are the shared cases in mcrtcases plus
    %  a paper-scale radial case (albedo 0.999, g 0.9, optical depth 10).

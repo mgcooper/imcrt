@@ -85,7 +85,7 @@ caller's global random stream when the file finishes. `testSetup.m` covers
   dated PASS/FAIL report. Hemispherical rows get a 5e-4 absolute allowance
   and angular rows a 2% relative allowance for binning systematics. The
   report names any row that passed only by an allowance.
-- `verify/impactreport.m`: writes `docs/impact-report.md`: every shared
+- `verify/impactreport.m`: writes `tests/reports/impact-report.md`: every shared
   case through the pre-fix kernel and each fix tag (extracted from git),
   with attribution per quantity, plus the retrospective against the
   frozen 2021 verification script. MATLAB only.

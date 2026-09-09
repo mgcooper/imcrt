@@ -31,20 +31,6 @@ For the full multi-run check, run the driver from the repo root (MATLAB only: it
 
 The cases are in `tests/verify/verifycases.m`. To add a case, add an entry there, add a verdict function for its reference, and add a branch to `mcrt_verify`. The fast test suite is `runtests('tests')`; `tests/README.md` describes it and the on-demand perf suite.
 
-## Post-publication corrections
-
-The results in the paper below came from the frozen kernel under `examples/cooper_etal_2021/c_model`, not from `src/mcrt.m`. That kernel saved its resolved tallies per run, but the final dataset behind the paper (`e_postprocess/mcrt_save.m`) keeps only the total transmittance, a hemispherical sum. The corrections below were found in `src/mcrt.m` after publication. `docs/impact-report.md` quantifies each one. It also runs a copy of the frozen 2021 verification script, carrying the production kernel's direct clause, against the corrected kernel on the same seeds: the two agree on every hemispherical sum run for run. A second copy with the production kernel's random-number use, on its own seeds, differs from the first by under one standard error. No correction reaches the published numbers. The detector-rod code under `examples` was not part of that audit.
-
-The commit before the first correction carries the tag `cooper2021-as-published`. Each correction carries a tag. Where a correction changed the golden digest under `tests/golden`, the digest was re-baselined in the same commit with the change stated. `fix-N-roulette` changed no golden line:
-
-- `fix-B-aliasing`: the direction update read the already-updated x cosine when forming the y cosine, which distorted the azimuthal spread. Only radially resolved tallies change (half-weight radii by 10 to 40 percent). The 2021 kernel called `chgdir` and never had this defect.
-- `fix-A-direct-tally`: a scattered packet leaving within a bin of grazing was counted as direct. The diffuse hemispherical sums change by 0.01 to 0.1 percent. A spurious direct reflectance of order 1e-6 drops to zero. The direct transmittance of a thick scattering slab, where it is tiny, changes by up to 60 percent of itself. The 2021 production kernel counted only unscattered packets as direct.
-- `fix-C-fluence`: the direct beam's absorption was added to every radial column of the resolved fluence instead of the on-axis column. Only `phi_rz` changes; the depth profile `phi_z` and every absorption total are unchanged. The 2021 runs had the fluence tallies off.
-- `fix-N-roulette`: a roulette survivor still below the threshold was dropped instead of playing again. Nothing changes at albedo 0.1 and above. Below it, an affected survivor loses its remaining weight, which is less than the threshold. The measured bias at albedo 0.05 is about 6e-6 per launched packet.
-- `fix-S-bin-measures`: the solid angle and annulus area of each bin came from the shifted reporting coordinates. That overstated the first bin's measure by 18.5 percent. The first angular and radial densities rise by 18.5 percent and the second fall by 3 percent; every hemispherical sum is unchanged. This one predates the paper, which reported no resolved densities.
-
-Known limitations and deferred items are listed with their reasons in `docs/dispositions.md`.
-
 ## How do I cite this?
 
 If you find this model useful, please consider citing the software release (see `CITATION.cff`), and/or the following paper:
