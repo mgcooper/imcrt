@@ -1,24 +1,25 @@
 function [Tdf_ra, Tdf_r, Tdf_a, Tdf, Tdr, Tt, se] = computeTransmittance(...
-      Tdf_ra, Tdr, Tdf_ss, Tdr_ss, grid)
+      Tdf_ra, Tdr, Tdf_ss, Tdr_ss, N, grid)
    %COMPUTETRANSMITTANCE compute transmittance (T)
    %
    % Inputs:
-   %   Tdf_ra  = diffuse photon density in spherical coord's       [-]
-   %   Tdr     = unscattered photon density along the z-axis       [-]
-   %   Tdf_ss  = sum of the squared weights of Tdf_ra           [-]
-   %   Tdr_ss  = sum of the squared weights of Tdr              [-]
-   %   grid    = the mcrt grid: centers ai, the bin measures dA and dsr
-   %             computed from the bin edges, and the photon count N
+   %   Tdf_ra  = diffuse photon density in spherical coord's         [-]
+   %   Tdr     = unscattered photon density along the z-axis         [-]
+   %   Tdf_ss  = sum of the squared weights of Tdf_ra                [-]
+   %   Tdr_ss  = sum of the squared weights of Tdr                   [-]
+   %   N       = number of photons
+   %   grid    = the mcrt grid: centers ai and the bin measures dA
+   %             and dsr computed from the bin edges (see mcrt)
    %
    % Outputs
-   %   Tdf_ra  = transmitted diffuse radiance, per incident power [1/cm2/sr]
-   %   Tdf_r   = transmitted diffuse irradiance, per incident power    [1/cm2]
-   %   Tdf_a   = transmitted diffuse radiant intensity, per incident   [1/sr]
-   %   Tdf     = transmitted diffuse fraction of the incident power     [-]
-   %   Tdr     = transmitted direct fraction of the incident power      [-]
-   %   Tt      = transmitted direct+diffuse fraction                    [-]
-   %   se      = standard error of each output (fields ra, r, a, df, dr,
-   %             t), from the sums of squares through mcstderr
+   %   Tdf_ra  = transmitted diffuse radiance, per incident power    [1/cm2/sr]
+   %   Tdf_r   = transmitted diffuse irradiance, per incident power  [1/cm2]
+   %   Tdf_a   = transmitted diffuse radiant intensity, per incident [1/sr]
+   %   Tdf     = transmitted diffuse fraction of the incident power  [-]
+   %   Tdr     = transmitted direct fraction of the incident power   [-]
+   %   Tt      = transmitted direct+diffuse fraction                 [-]
+   %   se      = standard error of each output (fields ra, r, a, df,
+   %             dr, t), from the sums of squares through mcstderr
    %
    % Matt Cooper, guycooper@ucla.edu, Dec 2020
    %
@@ -28,7 +29,6 @@ function [Tdf_ra, Tdf_r, Tdf_a, Tdf, Tdr, Tt, se] = computeTransmittance(...
    dA = grid.dA;              % area of each annular ring              [cm^2]
    dsr = grid.dsr;            % solid angle of each angular bin        [sr]
    cosa = cos(grid.ai);       % projection factor                      [1]
-   N = grid.N;                % number of photons                      [-]
 
    % sum the 2-d arrays into 1-d and 0-d arrays
    Tdf_r = sum(Tdf_ra, 1);    % Eq. 4.5

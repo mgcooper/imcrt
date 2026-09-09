@@ -8,7 +8,7 @@ function RT = mcrt(ka, ks, g, Z, dz, N, varargin)
    %  RT holds the diffuse (df) and direct (dr) reflectance (R), transmittance
    %  (T), absorption (A), and fluence (phi), resolved by radius (r), angle (a),
    %  and depth (z) on a grid with vertical spacing dz. RT.grid holds the grid
-   %  and its bin geometry, and RT.grid.N the photon packet count. RT.se holds
+   %  and its bin geometry, and RT.N the photon packet count. RT.se holds
    %  the standard error of every reflectance and transmittance output from
    %  one run (sum of squared weights, see mcstderr, which also states the
    %  covariance between exclusive bins). Absorption and fluence carry no
@@ -62,7 +62,7 @@ function RT = mcrt(ka, ks, g, Z, dz, N, varargin)
    nz = opts.nz;     % vertical
 
    % build a grid to calculate observable quantities (eq. 4.1/4.2 Wang)
-   grid = buildgrid(R, A, Z, dr, da, dz, N);
+   grid = buildgrid(R, A, Z, dr, da, dz);
 
    % initialize output grids with +1 for overflow
    Rdr = 0;                   % reflectance, direct (unscattered)
@@ -169,13 +169,13 @@ function RT = mcrt(ka, ks, g, Z, dz, N, varargin)
    % the bin measures and N; computeAbsorption does the same and computes
    % fluence; standard errors are computed from the squared weights.
    [Rdf_ra, Rdf_r, Rdf_a, Rdf, Rdr, Rt, seR] = computeReflectance( ...
-      Rdf_ra, Rdr, Rdf_ss, Rdr_ss, grid);
+      Rdf_ra, Rdr, Rdf_ss, Rdr_ss, N, grid);
 
    [Tdf_ra, Tdf_r, Tdf_a, Tdf, Tdr, Tt, seT] = computeTransmittance( ...
-      Tdf_ra, Tdr, Tdf_ss, Tdr_ss, grid);
+      Tdf_ra, Tdr, Tdf_ss, Tdr_ss, N, grid);
 
    [Adf_rz, Adf_z, Adf, Adr_z, phi_rz, phi_z] = computeAbsorption( ...
-      Adf_rz, Adr_z, ka, grid);
+      Adf_rz, Adr_z, ka, N, grid);
 
    % arrange the output
    RT.Rdf_ra = Rdf_ra;
@@ -198,11 +198,12 @@ function RT = mcrt(ka, ks, g, Z, dz, N, varargin)
    RT.phi_rz = phi_rz;
    RT.phi_z = phi_z;
 
-   % standard errors of the exit outputs from this run
+   % assign standard errors and the packet count N
    RT.se = struct('Rdf_ra', seR.ra, 'Rdf_r', seR.r, 'Rdf_a', seR.a, ...
       'Rdf', seR.df, 'Rdr', seR.dr, 'Rt', seR.t, 'Tdf_ra', seT.ra, ...
       'Tdf_r', seT.r, 'Tdf_a', seT.a, 'Tdf', seT.df, 'Tdr', seT.dr, ...
       'Tt', seT.t);
+   RT.N = N;
 
    % return the grid
    RT.grid = grid;
@@ -220,12 +221,17 @@ function opts = parseinputs(ka, ks, g, Z, dz, N, varargin)
    %  name, raises mcrt:input with the parser's message; a fractional bin
    %  count raises buildgrid:nonintegral from wholebins, the same rule
    %  buildgrid applies.
+
    double = {'double'};
    scalar = {'scalar', 'real', 'finite'};
+
    p = inputParser;
    p.FunctionName = 'mcrt';
+
    % a misspelled option must fail, not match a unique prefix
    p.PartialMatching = false;
+
+   % add required arguments
    addRequired(p, 'ka', @(x) validateattributes(x, double, ...
       [scalar, {'positive'}], 'mcrt', 'ka'));
    addRequired(p, 'ks', @(x) validateattributes(x, double, ...
@@ -238,6 +244,8 @@ function opts = parseinputs(ka, ks, g, Z, dz, N, varargin)
       [scalar, {'positive'}], 'mcrt', 'dz'));
    addRequired(p, 'N', @(x) validateattributes(x, double, ...
       [scalar, {'integer', 'positive'}], 'mcrt', 'N'));
+
+   % add optional name-value arguments
    addParameter(p, 'wmin', 1e-4, @(x) validateattributes(x, double, ...
       [scalar, {'>', 0, '<', 1}], 'mcrt', 'wmin'));
    addParameter(p, 'wrr', 10, @(x) validateattributes(x, double, ...
@@ -248,6 +256,7 @@ function opts = parseinputs(ka, ks, g, Z, dz, N, varargin)
       [scalar, {'positive'}], 'mcrt', 'dr'));
    addParameter(p, 'da', pi/60, @(x) validateattributes(x, double, ...
       [scalar, {'>', 0, '<=', pi/2}], 'mcrt', 'da'));
+
    % one identifier for every bad input; the parser's message names it
    try
       parse(p, ka, ks, g, Z, dz, N, varargin{:});

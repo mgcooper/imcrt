@@ -1,24 +1,25 @@
 function [Rdf_ra, Rdf_r, Rdf_a, Rdf, Rdr, Rt, se] = computeReflectance(...
-      Rdf_ra, Rdr, Rdf_ss, Rdr_ss, grid)
+      Rdf_ra, Rdr, Rdf_ss, Rdr_ss, N, grid)
    %COMPUTEREFLECTANCE compute reflectance (R)
    %
    % Inputs:
-   %   Rdf_ra  = diffuse photon density in spherical coord's       [-]
-   %   Rdr     = unscattered photon density along the z-axis       [-]
-   %   Rdf_ss  = sum of the squared weights of Rdf_ra           [-]
-   %   Rdr_ss  = sum of the squared weights of Rdr              [-]
-   %   grid    = the mcrt grid: centers ai, the bin measures dA and dsr
-   %             computed from the bin edges, and the photon count N
+   %   Rdf_ra  = diffuse photon density in spherical coord's         [-]
+   %   Rdr     = unscattered photon density along the z-axis         [-]
+   %   Rdf_ss  = sum of the squared weights of Rdf_ra                [-]
+   %   Rdr_ss  = sum of the squared weights of Rdr                   [-]
+   %   N       = number of photons
+   %   grid    = the mcrt grid: centers ai and the bin measures dA
+   %             and dsr computed from the bin edges (see mcrt)
    %
    % Outputs
    %   Rdf_ra  = reflected diffuse radiance, per unit incident power [1/cm2/sr]
    %   Rdf_r   = reflected diffuse irradiance, per incident power    [1/cm2]
    %   Rdf_a   = reflected diffuse radiant intensity, per incident   [1/sr]
-   %   Rdf     = reflected diffuse fraction of the incident power     [-]
-   %   Rdr     = reflected direct fraction of the incident power      [-]
-   %   Rt      = reflected direct+diffuse fraction                    [-]
-   %   se      = standard error of each output (fields ra, r, a, df, dr,
-   %             t), from the sums of squares through mcstderr
+   %   Rdf     = reflected diffuse fraction of the incident power    [-]
+   %   Rdr     = reflected direct fraction of the incident power     [-]
+   %   Rt      = reflected direct+diffuse fraction                   [-]
+   %   se      = standard error of each output (fields ra, r, a, df,
+   %             dr, t), from the sums of squares through mcstderr
    %
    % Matt Cooper, guycooper@ucla.edu, Dec 2020
    %
@@ -28,7 +29,6 @@ function [Rdf_ra, Rdf_r, Rdf_a, Rdf, Rdr, Rt, se] = computeReflectance(...
    dA = grid.dA;              % area of each annular ring              [cm^2]
    dsr = grid.dsr;            % solid angle of each angular bin        [sr]
    cosa = cos(grid.ai);       % projection factor                      [1]
-   N = grid.N;                % number of photons                      [-]
 
    % sum the 2-d arrays into 1-d and 0-d arrays
    Rdf_r = sum(Rdf_ra, 1);    % Eq. 4.3

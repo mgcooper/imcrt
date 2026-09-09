@@ -29,7 +29,6 @@ function grid = smallgrid()
    grid.dz = dz*ones(2, 1);
    grid.dA = pi*(redge(2:end).^2 - redge(1:end-1).^2);
    grid.dsr = 2*pi*(cos(aedge(1:end-1)) - cos(aedge(2:end)));
-   grid.N = 10;
 end
 
 function testReflectanceAndTransmittance(testCase)
@@ -38,13 +37,13 @@ function testReflectanceAndTransmittance(testCase)
    % part. With unit weights the squares equal the sums, and every
    % standard error is mcstderr of the raw sum scaled like its output.
    grid = smallgrid();
-   N = grid.N;
+   N = 10;
    raw = [1 2; 0 3; 4 0];
    direct = 2;
    [ra, r, a, df, dr, t, se] = computeReflectance(raw, direct, raw, ...
-      direct, grid);
+      direct, N, grid);
    [tra, tr, ta, tdf, tdr, tt, tse] = computeTransmittance(raw, direct, ...
-      raw, direct, grid);
+      raw, direct, N, grid);
    cosa = cos(grid.ai);
    returned = {ra, r, a, df, dr, t, tra, tr, ta, tdf, tdr, tt};
    expected = {raw./(grid.dA.*grid.dsr.*cosa.*N), sum(raw, 1)./(grid.dA*N), ...
@@ -66,11 +65,11 @@ function testAbsorptionAndFluence(testCase)
    % fluence is total absorption over ka, the direct pencil in radial bin
    % 1 only, and ka times the depth integral of phi_z returns Adf + Adr.
    grid = smallgrid();
-   N = grid.N;
+   N = 10;
    ka = 2;
    raw = [1 2; 3 0];
    rawdr = [4; 1];
-   [rz, z, df, drz, prz, pz] = computeAbsorption(raw, rawdr, ka, grid);
+   [rz, z, df, drz, prz, pz] = computeAbsorption(raw, rawdr, ka, N, grid);
    dV = grid.dA.*grid.dz;
    erz = raw./dV/N;
    pencil = rawdr./dV(:, 1)/N;

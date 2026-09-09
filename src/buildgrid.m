@@ -1,9 +1,12 @@
-function [grid,ri,ai,zi,dr,da,dz] = buildgrid(R,A,Z,dr,da,dz,N,makeplot)
+function [grid,ri,ai,zi,dr,da,dz] = buildgrid(R,A,Z,dr,da,dz,makeplot)
    %BUILDGRID Build grids for scoring observable quantities.
    %
-   %   [RI,AI,ZI,DR,DA,DZ] = BUILDGRID(R,A,Z,DR,DA,DZ) builds radial,
+   %   [GRID,RI,AI,ZI,DR,DA,DZ] = BUILDGRID(R,A,Z,DR,DA,DZ) builds radial,
    %   angular, and vertical scoring grids from the extents R, A, and Z and
-   %   nominal bin widths DR, DA, and DZ.
+   %   nominal bin widths DR, DA, and DZ. GRID is a struct with the center
+   %   coordinates RI, AI, ZI, the bin widths DR, DA, DZ (one per bin), the
+   %   annulus areas dA, and the solid angles dsr; the vectors follow it as
+   %   separate outputs.
    %
    %   Each extent must contain a whole number of bins. R/DR, A/DA, and Z/DZ are
    %   checked to ensure they are whole numbers within a relative tolerance of
@@ -25,15 +28,15 @@ function [grid,ri,ai,zi,dr,da,dz] = buildgrid(R,A,Z,dr,da,dz,N,makeplot)
    %   Angular coordinates are expressed as theta in radians; mcrt scoring uses
    %   u = cos(theta).
    %
-   %   BUILDGRID(...,makeplot=true) plots the original and optimized radial and
-   %   angular grid centers.
+   %   BUILDGRID(...,MAKEPLOT) with MAKEPLOT true plots the original and
+   %   optimized radial and angular grid centers.
    %
    %   Example:
-   %      [ri,ai,zi,dr,da,dz] = buildgrid(200,pi/2,100,4,pi/50,5,Plot=true);
+   %      [grid,ri,ai,zi,dr,da,dz] = buildgrid(200,pi/2,100,4,pi/50,5,true);
    %
    % See also:
 
-   if nargin < 8
+   if nargin < 7
       makeplot = false;
    else
       assert(islogical(makeplot))
@@ -96,8 +99,7 @@ function [grid,ri,ai,zi,dr,da,dz] = buildgrid(R,A,Z,dr,da,dz,N,makeplot)
       'da', da, ...
       'dz', dz, ...
       'dA', dA, ...
-      'dsr', dsr, ...
-      'N', N);
+      'dsr', dsr);
 end
 
 function c = centers(width, extent, n)
