@@ -1,24 +1,29 @@
 function Setup()
-% Setup.m setup the model paths etc.
+   % Setup.m setup the model paths etc.
 
-% turn off complaints about paths not already being on the path
-warning off
+   % Resolve paths from this file so Setup works from any working directory.
+   thispath = fileparts(mfilename('fullpath'));
 
-% add paths containing source code
-addpath(genpath([pwd() filesep 'src']));
+   % Add explicit dirs, not genpath over the root: the git-excluded sandbox
+   % archive holds a script named mcrt.m that would shadow src/mcrt.m (G).
+   addpath(thispath, fullfile(thispath, 'src'), ...
+      fullfile(thispath, 'src', 'derivative'));
 
-% remove git paths
-rmpath(genpath([pwd() filesep '.git*']));
+   % remove paths containing example code
+   % Only dirs a prior session put on the path: rmpath warns on absent dirs,
+   % and Octave's warning has no id, so warning('off', id) cannot silence it.
+   exdirs = strsplit(genpath(fullfile(thispath, 'examples')), pathsep);
+   exdirs = exdirs(ismember(exdirs, strsplit(path, pathsep)));
+   if ~isempty(exdirs)
+      rmpath(exdirs{:});
+   end
 
-% remove paths containing example code
-rmpath(genpath([pwd() filesep 'examples']));
+   %try
+   %   rmpath(genpath(fullfile(thispath,'examples')));
+   %catch
+   %end
 
-%try
-%   rmpath([pwd() filesep 'examples']);
-%catch
-%end
+   % display install message
+   fprintf('\n * ice Monte Carlo Radiative Transfer activated *\n\n')
 
-warning on 
-
-% display install message
-fprintf('\n * ice-Monte Carlo Radiative Transfer activated *\n\n')
+end

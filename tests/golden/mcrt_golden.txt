@@ -1,0 +1,492 @@
+vdh_reflectance Rdf_ra.size [30 2001]
+vdh_reflectance Rdf_ra.sum 12888.499794947978
+vdh_reflectance Rdf_ra.sumsq 1756751.8013840714
+vdh_reflectance Rdf_ra.first 0
+vdh_reflectance Rdf_ra.last 0
+vdh_reflectance Rdf_ra.checksum 7511199
+vdh_reflectance Rdf_r.size [1 2001]
+vdh_reflectance Rdf_r.sum 1303.6633159425919
+vdh_reflectance Rdf_r.sumsq 82144.113734936793
+vdh_reflectance Rdf_r.first 105.93379145438213
+vdh_reflectance Rdf_r.last 0
+vdh_reflectance Rdf_r.checksum 20813930
+vdh_reflectance Rdf_a.size [30 1]
+vdh_reflectance Rdf_a.sum 0.49417257459274311
+vdh_reflectance Rdf_a.sumsq 0.0094132360081411286
+vdh_reflectance Rdf_a.first 0.014020586808443333
+vdh_reflectance Rdf_a.last 0.00055885103199630293
+vdh_reflectance Rdf_a.checksum 1215563
+vdh_reflectance Rdf 0.097720627110275182
+vdh_reflectance Rdr 0
+vdh_reflectance Rt 0.097720627110275182
+vdh_reflectance Tdf_ra.size [30 2001]
+vdh_reflectance Tdf_ra.sum 466752.3095779093
+vdh_reflectance Tdf_ra.sumsq 27929970109.705395
+vdh_reflectance Tdf_ra.first 146903.94036663076
+vdh_reflectance Tdf_ra.last 0
+vdh_reflectance Tdf_ra.checksum 23029517
+vdh_reflectance Tdf_r.size [1 2001]
+vdh_reflectance Tdf_r.sum 19134.812494092366
+vdh_reflectance Tdf_r.sumsq 58397596.477129139
+vdh_reflectance Tdf_r.first 6307.4374003763996
+vdh_reflectance Tdf_r.last 0
+vdh_reflectance Tdf_r.checksum 23129622
+vdh_reflectance Tdf_a.size [30 1]
+vdh_reflectance Tdf_a.sum 5.49121985686737
+vdh_reflectance Tdf_a.sumsq 2.4522367533082425
+vdh_reflectance Tdf_a.first 0.81685180785270073
+vdh_reflectance Tdf_a.last 0.00029738500908110636
+vdh_reflectance Tdf_a.checksum 11978901
+vdh_reflectance Tdf 0.52997139160539675
+vdh_reflectance Tdr 0.13100000000000001
+vdh_reflectance Tt 0.66097139160539675
+vdh_reflectance Adf_z.size [21 1]
+vdh_reflectance Adf_z.sum 154.40798128432806
+vdh_reflectance Adf_z.sumsq 1255.6338260857456
+vdh_reflectance Adf_z.first 2.8536327747512589
+vdh_reflectance Adf_z.last 0
+vdh_reflectance Adf_z.checksum 33520796
+vdh_reflectance Adf 0.15440798128432806
+vdh_reflectance Adf_rz.size [21 2001]
+vdh_reflectance Adf_rz.sum 11969175.849948157
+vdh_reflectance Adf_rz.sumsq 3405990344575.2979
+vdh_reflectance Adf_rz.first 182200.57885160163
+vdh_reflectance Adf_rz.last 0
+vdh_reflectance Adf_rz.checksum 8026868
+vdh_reflectance Adr_z.size [21 1]
+vdh_reflectance Adr_z.sum 86.900000000000148
+vdh_reflectance Adr_z.sumsq 496.67979999999972
+vdh_reflectance Adr_z.first 9.8999999999998654
+vdh_reflectance Adr_z.last 0
+vdh_reflectance Adr_z.checksum 13254224
+vdh_reflectance phi_rz.size [21 2001]
+vdh_reflectance phi_rz.sum 3963030.4959319597
+vdh_reflectance phi_rz.sumsq 760400554260.3645
+vdh_reflectance phi_rz.first 333346.84520710865
+vdh_reflectance phi_rz.last 0
+vdh_reflectance phi_rz.checksum 19965911
+vdh_reflectance phi_z.size [21 1]
+vdh_reflectance phi_z.sum 24.130798128432819
+vdh_reflectance phi_z.sumsq 29.361193937505295
+vdh_reflectance phi_z.first 1.2753632774751125
+vdh_reflectance phi_z.last 0
+vdh_reflectance phi_z.checksum 17525098
+vdh_reflectance se.Rdf_ra.size [30 2001]
+vdh_reflectance se.Rdf_ra.sum 10592.081268000815
+vdh_reflectance se.Rdf_ra.sumsq 1566203.769755071
+vdh_reflectance se.Rdf_ra.first 0
+vdh_reflectance se.Rdf_ra.last 0
+vdh_reflectance se.Rdf_ra.checksum 19406610
+vdh_reflectance se.Rdf_r.size [1 2001]
+vdh_reflectance se.Rdf_r.sum 290.06653226128162
+vdh_reflectance se.Rdf_r.sumsq 5536.8395108840841
+vdh_reflectance se.Rdf_r.first 48.935189407718077
+vdh_reflectance se.Rdf_r.last 0
+vdh_reflectance se.Rdf_r.checksum 22237337
+vdh_reflectance se.Rdf_a.size [30 1]
+vdh_reflectance se.Rdf_a.sum 0.084114800801180778
+vdh_reflectance se.Rdf_a.sumsq 0.00033819998307467426
+vdh_reflectance se.Rdf_a.first 0.010125084695884912
+vdh_reflectance se.Rdf_a.last 0.00031224744762512412
+vdh_reflectance se.Rdf_a.checksum 30062999
+vdh_reflectance se.Rdf 0.0023510745349296152
+vdh_reflectance se.Rdr 0
+vdh_reflectance se.Rt 0.0023510745349296152
+vdh_reflectance se.Tdf_ra.size [30 2001]
+vdh_reflectance se.Tdf_ra.sum 85241.636974353838
+vdh_reflectance se.Tdf_ra.sumsq 619083960.68682218
+vdh_reflectance se.Tdf_ra.first 21880.456599241577
+vdh_reflectance se.Tdf_ra.last 0
+vdh_reflectance se.Tdf_ra.checksum 28057113
+vdh_reflectance se.Tdf_r.size [1 2001]
+vdh_reflectance se.Tdf_r.sum 1170.025681097914
+vdh_reflectance se.Tdf_r.sumsq 223576.85846339772
+vdh_reflectance se.Tdf_r.first 413.89381567445963
+vdh_reflectance se.Tdf_r.last 0
+vdh_reflectance se.Tdf_r.checksum 6703831
+vdh_reflectance se.Tdf_a.size [30 1]
+vdh_reflectance se.Tdf_a.sum 0.35703749345921715
+vdh_reflectance se.Tdf_a.sumsq 0.013906107196623064
+vdh_reflectance se.Tdf_a.first 0.089737654464324579
+vdh_reflectance se.Tdf_a.last 0.00021475908571953799
+vdh_reflectance se.Tdf_a.checksum 18901458
+vdh_reflectance se.Tdf 0.0036502076793617586
+vdh_reflectance se.Tdr 0.0033741722694388891
+vdh_reflectance se.Tt 0.0032897439843167352
+vdh_reflectance N 10000
+vdh_reflectance grid.ri.size [1 2001]
+vdh_reflectance grid.ri.sum 2002.0012970760313
+vdh_reflectance grid.ri.sumsq 2670.6688337842652
+vdh_reflectance grid.ri.first 0.00066666666666666664
+vdh_reflectance grid.ri.last 2.0005000416562528
+vdh_reflectance grid.ri.checksum 5652917
+vdh_reflectance grid.ai.size [30 1]
+vdh_reflectance grid.ai.sum 23.583383764406452
+vdh_reflectance grid.ai.sumsq 24.676753016645101
+vdh_reflectance grid.ai.first 0.034904989910627432
+vdh_reflectance grid.ai.last 1.5446223708042537
+vdh_reflectance grid.ai.checksum 5884672
+vdh_reflectance grid.zi.size [21 1]
+vdh_reflectance grid.zi.sum 0.2205
+vdh_reflectance grid.zi.sumsq 0.0030852500000000003
+vdh_reflectance grid.zi.first 0.00050000000000000001
+vdh_reflectance grid.zi.last 0.020500000000000001
+vdh_reflectance grid.zi.checksum 4060354
+vdh_reflectance grid.dr.size [1 2001]
+vdh_reflectance grid.dr.sum 2.0010000000000017
+vdh_reflectance grid.dr.sumsq 0.0020010000000000227
+vdh_reflectance grid.dr.first 0.001
+vdh_reflectance grid.dr.last 0.001
+vdh_reflectance grid.dr.checksum 26992828
+vdh_reflectance grid.da.size [30 1]
+vdh_reflectance grid.da.sum 1.570796326794897
+vdh_reflectance grid.da.sumsq 0.082246703342411354
+vdh_reflectance grid.da.first 0.052359877559829883
+vdh_reflectance grid.da.last 0.052359877559829883
+vdh_reflectance grid.da.checksum 129725
+vdh_reflectance grid.dz.size [21 1]
+vdh_reflectance grid.dz.sum 0.021000000000000012
+vdh_reflectance grid.dz.sumsq 2.1000000000000006e-05
+vdh_reflectance grid.dz.first 0.001
+vdh_reflectance grid.dz.last 0.001
+vdh_reflectance grid.dz.checksum 4184424
+vdh_reflectance grid.dA.size [1 2001]
+vdh_reflectance grid.dA.sum 12.578940126566184
+vdh_reflectance grid.dA.sumsq 0.10543376633567246
+vdh_reflectance grid.dA.first 3.1415926535897929e-06
+vdh_reflectance grid.dA.last 0.012569512207011817
+vdh_reflectance grid.dA.checksum 16357816
+vdh_reflectance grid.dsr.size [30 1]
+vdh_reflectance grid.dsr.sum 6.2831853071795862
+vdh_reflectance grid.dsr.sumsq 1.6231139781357242
+vdh_reflectance grid.dsr.first 0.0086108870940619572
+vdh_reflectance grid.dsr.last 0.3288365113028589
+vdh_reflectance grid.dsr.checksum 6974949
+absorbing Rdf_ra.size [30 2001]
+absorbing Rdf_ra.sum 1837.1990970654952
+absorbing Rdf_ra.sumsq 171972.75331404925
+absorbing Rdf_ra.first 369.88511048826774
+absorbing Rdf_ra.last 0
+absorbing Rdf_ra.checksum 23864808
+absorbing Rdf_r.size [1 2001]
+absorbing Rdf_r.sum 140.6259505753037
+absorbing Rdf_r.sumsq 1882.6848720487808
+absorbing Rdf_r.first 23.682255532074031
+absorbing Rdf_r.last 0
+absorbing Rdf_r.checksum 30667711
+absorbing Rdf_a.size [30 1]
+absorbing Rdf_a.sum 0.025992326781476557
+absorbing Rdf_a.sumsq 2.6126533480344488e-05
+absorbing Rdf_a.first 0.0011845469448825885
+absorbing Rdf_a.last 0.0001590455992638592
+absorbing Rdf_a.checksum 25752580
+absorbing Rdf 0.0051807099999999998
+absorbing Rdr 0
+absorbing Rt 0.0051807099999999998
+absorbing Tdf_ra.size [30 2001]
+absorbing Tdf_ra.sum 545.66321949122539
+absorbing Tdf_ra.sumsq 22399.184333784415
+absorbing Tdf_ra.first 0
+absorbing Tdf_ra.last 0
+absorbing Tdf_ra.checksum 4067390
+absorbing Tdf_r.size [1 2001]
+absorbing Tdf_r.sum 33.000869166589553
+absorbing Tdf_r.sumsq 83.091596219680042
+absorbing Tdf_r.first 3.1862819606997452
+absorbing Tdf_r.last 0
+absorbing Tdf_r.checksum 5476821
+absorbing Tdf_a.size [30 1]
+absorbing Tdf_a.sum 0.014613368821569002
+absorbing Tdf_a.sumsq 1.6944241417829388e-05
+absorbing Tdf_a.first 0.0012913884340288611
+absorbing Tdf_a.last 0
+absorbing Tdf_a.checksum 3238025
+absorbing Tdf 0.0014992300000000003
+absorbing Tdr 0.0076
+absorbing Tt 0.0090992299999999998
+absorbing Adf_z.size [11 1]
+absorbing Adf_z.sum 18.512056800000021
+absorbing Adf_z.sumsq 51.300454003842425
+absorbing Adf_z.first 3.1201650000000143
+absorbing Adf_z.last 0
+absorbing Adf_z.checksum 14757502
+absorbing Adf 0.092560284000000131
+absorbing Adf_rz.size [11 2001]
+absorbing Adf_rz.sum 1673300.7130629327
+absorbing Adf_rz.sumsq 241436098834.82687
+absorbing Adf_rz.first 307645.67739093344
+absorbing Adf_rz.last 0
+absorbing Adf_rz.checksum 29525674
+absorbing Adr_z.size [11 1]
+absorbing Adr_z.sum 178.63200000000657
+absorbing Adr_z.sumsq 7857.7380720008223
+absorbing Adr_z.first 69.102000000004537
+absorbing Adr_z.last 0
+absorbing Adr_z.checksum 1758136
+absorbing phi_rz.size [11 2001]
+absorbing phi_rz.sum 650373.69224275462
+absorbing phi_rz.sumsq 101565740605.30164
+absorbing phi_rz.first 247816.61591627428
+absorbing phi_rz.last 0
+absorbing phi_rz.checksum 2498256
+absorbing phi_z.size [11 1]
+absorbing phi_z.sum 2.1904895200000731
+absorbing phi_z.sumsq 1.1140376271032977
+absorbing phi_z.first 0.80246850000005054
+absorbing phi_z.last 0
+absorbing phi_z.checksum 2561481
+absorbing se.Rdf_ra.size [30 2001]
+absorbing se.Rdf_ra.sum 1535.7616271252459
+absorbing se.Rdf_ra.sumsq 159392.88601305199
+absorbing se.Rdf_ra.first 369.88511048826774
+absorbing se.Rdf_ra.last 0
+absorbing se.Rdf_ra.checksum 19063577
+absorbing se.Rdf_r.size [1 2001]
+absorbing se.Rdf_r.sum 32.698981176602885
+absorbing se.Rdf_r.sumsq 121.22181574981929
+absorbing se.Rdf_r.first 8.4430568948583939
+absorbing se.Rdf_r.last 0
+absorbing se.Rdf_r.checksum 17065522
+absorbing se.Rdf_a.size [30 1]
+absorbing se.Rdf_a.sum 0.0070174929980473906
+absorbing se.Rdf_a.sumsq 2.7793301792139022e-06
+absorbing se.Rdf_a.first 0.0011614343261893594
+absorbing se.Rdf_a.last 6.8122123114780153e-05
+absorbing se.Rdf_a.checksum 24868868
+absorbing se.Rdf 0.00020940515882290046
+absorbing se.Rdr 0
+absorbing se.Rt 0.00020940515882290046
+absorbing se.Tdf_ra.size [30 2001]
+absorbing se.Tdf_ra.sum 505.00464401364729
+absorbing se.Tdf_ra.sumsq 21850.876700624955
+absorbing se.Tdf_ra.first 0
+absorbing se.Tdf_ra.last 0
+absorbing se.Tdf_ra.checksum 33489909
+absorbing se.Tdf_r.size [1 2001]
+absorbing se.Tdf_r.sum 15.143549074351132
+absorbing se.Tdf_r.sumsq 21.501542532710733
+absorbing se.Tdf_r.first 3.1831001350453634
+absorbing se.Tdf_r.last 0
+absorbing se.Tdf_r.checksum 14313725
+absorbing se.Tdf_a.size [30 1]
+absorbing se.Tdf_a.sum 0.0056268046741712024
+absorbing se.Tdf_a.sumsq 3.0108149418560025e-06
+absorbing se.Tdf_a.first 0.0011671585403658898
+absorbing se.Tdf_a.last 0
+absorbing se.Tdf_a.checksum 1413124
+absorbing se.Tdf 0.00011301674884397414
+absorbing se.Tdr 0.00086850413352096043
+absorbing se.Tt 0.00087452453250695358
+absorbing N 10000
+absorbing grid.ri.size [1 2001]
+absorbing grid.ri.sum 2002.0012970760313
+absorbing grid.ri.sumsq 2670.6688337842652
+absorbing grid.ri.first 0.00066666666666666664
+absorbing grid.ri.last 2.0005000416562528
+absorbing grid.ri.checksum 5652917
+absorbing grid.ai.size [30 1]
+absorbing grid.ai.sum 23.583383764406452
+absorbing grid.ai.sumsq 24.676753016645101
+absorbing grid.ai.first 0.034904989910627432
+absorbing grid.ai.last 1.5446223708042537
+absorbing grid.ai.checksum 5884672
+absorbing grid.zi.size [11 1]
+absorbing grid.zi.sum 0.30249999999999999
+absorbing grid.zi.sumsq 0.01106875
+absorbing grid.zi.first 0.0025000000000000001
+absorbing grid.zi.last 0.052499999999999998
+absorbing grid.zi.checksum 8611669
+absorbing grid.dr.size [1 2001]
+absorbing grid.dr.sum 2.0010000000000017
+absorbing grid.dr.sumsq 0.0020010000000000227
+absorbing grid.dr.first 0.001
+absorbing grid.dr.last 0.001
+absorbing grid.dr.checksum 26992828
+absorbing grid.da.size [30 1]
+absorbing grid.da.sum 1.570796326794897
+absorbing grid.da.sumsq 0.082246703342411354
+absorbing grid.da.first 0.052359877559829883
+absorbing grid.da.last 0.052359877559829883
+absorbing grid.da.checksum 129725
+absorbing grid.dz.size [11 1]
+absorbing grid.dz.sum 0.054999999999999993
+absorbing grid.dz.sumsq 0.00027500000000000007
+absorbing grid.dz.first 0.0050000000000000001
+absorbing grid.dz.last 0.0050000000000000001
+absorbing grid.dz.checksum 3609022
+absorbing grid.dA.size [1 2001]
+absorbing grid.dA.sum 12.578940126566184
+absorbing grid.dA.sumsq 0.10543376633567246
+absorbing grid.dA.first 3.1415926535897929e-06
+absorbing grid.dA.last 0.012569512207011817
+absorbing grid.dA.checksum 16357816
+absorbing grid.dsr.size [30 1]
+absorbing grid.dsr.sum 6.2831853071795862
+absorbing grid.dsr.sumsq 1.6231139781357242
+absorbing grid.dsr.first 0.0086108870940619572
+absorbing grid.dsr.last 0.3288365113028589
+absorbing grid.dsr.checksum 6974949
+mini_fluence Rdf_ra.size [30 2001]
+mini_fluence Rdf_ra.sum 10584.636863509522
+mini_fluence Rdf_ra.sumsq 2182782.6473649787
+mini_fluence Rdf_ra.first 0
+mini_fluence Rdf_ra.last 0
+mini_fluence Rdf_ra.checksum 27699707
+mini_fluence Rdf_r.size [1 2001]
+mini_fluence Rdf_r.sum 1103.0903285263848
+mini_fluence Rdf_r.sumsq 45203.508282394578
+mini_fluence Rdf_r.first 0
+mini_fluence Rdf_r.last 0
+mini_fluence Rdf_r.checksum 10886393
+mini_fluence Rdf_a.size [30 1]
+mini_fluence Rdf_a.sum 1.4599528016057217
+mini_fluence Rdf_a.sumsq 0.087012714498962071
+mini_fluence Rdf_a.first 0.050954159159983872
+mini_fluence Rdf_a.last 0.0012312012814712928
+mini_fluence Rdf_a.checksum 31204664
+mini_fluence Rdf 0.25900963725442239
+mini_fluence Rdr 0
+mini_fluence Rt 0.25900963725442239
+mini_fluence Tdf_ra.size [30 2001]
+mini_fluence Tdf_ra.sum 33796.099593974497
+mini_fluence Tdf_ra.sumsq 8688242.0591259021
+mini_fluence Tdf_ra.first 0
+mini_fluence Tdf_ra.last 0
+mini_fluence Tdf_ra.checksum 27143941
+mini_fluence Tdf_r.size [1 2001]
+mini_fluence Tdf_r.sum 2873.3523579781458
+mini_fluence Tdf_r.sumsq 160542.79386951672
+mini_fluence Tdf_r.first 0
+mini_fluence Tdf_r.last 0
+mini_fluence Tdf_r.checksum 6778832
+mini_fluence Tdf_a.size [30 1]
+mini_fluence Tdf_a.sum 4.0586847731712083
+mini_fluence Tdf_a.sumsq 0.82322714552651144
+mini_fluence Tdf_a.first 0.21124986334530776
+mini_fluence Tdf_a.last 0
+mini_fluence Tdf_a.checksum 17227657
+mini_fluence Tdf 0.57244465647396281
+mini_fluence Tdr 0
+mini_fluence Tt 0.57244465647396281
+mini_fluence Adf_z.size [21 1]
+mini_fluence Adf_z.sum 31.709141254322969
+mini_fluence Adf_z.sumsq 51.991153853841581
+mini_fluence Adf_z.first 0.84318937067798472
+mini_fluence Adf_z.last 0
+mini_fluence Adf_z.checksum 15858773
+mini_fluence Adf 0.15854570627161485
+mini_fluence Adf_rz.size [21 2001]
+mini_fluence Adf_rz.sum 814476.34277156601
+mini_fluence Adf_rz.sumsq 31264267298.475636
+mini_fluence Adf_rz.first 58512.899433333943
+mini_fluence Adf_rz.last 0
+mini_fluence Adf_rz.checksum 11877500
+mini_fluence Adr_z.size [21 1]
+mini_fluence Adr_z.sum 1.9999999999999805
+mini_fluence Adr_z.sumsq 1.0109399999999726
+mini_fluence Adr_z.first 0.82099999999998696
+mini_fluence Adr_z.last 0
+mini_fluence Adr_z.checksum 9720924
+mini_fluence phi_rz.size [21 2001]
+mini_fluence phi_rz.sum 1451096.115139141
+mini_fluence phi_rz.sumsq 222671015831.34076
+mini_fluence phi_rz.first 319845.31599022192
+mini_fluence phi_rz.last 0
+mini_fluence phi_rz.checksum 21439495
+mini_fluence phi_z.size [21 1]
+mini_fluence phi_z.sum 33.709141254322951
+mini_fluence phi_z.sumsq 58.04950963327763
+mini_fluence phi_z.first 1.6641893706779718
+mini_fluence phi_z.last 0
+mini_fluence phi_z.checksum 17005468
+mini_fluence se.Rdf_ra.size [30 2001]
+mini_fluence se.Rdf_ra.sum 10403.61095774434
+mini_fluence se.Rdf_ra.sumsq 2170013.3785729427
+mini_fluence se.Rdf_ra.first 0
+mini_fluence se.Rdf_ra.last 0
+mini_fluence se.Rdf_ra.checksum 23480475
+mini_fluence se.Rdf_r.size [1 2001]
+mini_fluence se.Rdf_r.sum 608.79363121277186
+mini_fluence se.Rdf_r.sumsq 13950.263009176271
+mini_fluence se.Rdf_r.first 0
+mini_fluence se.Rdf_r.last 0
+mini_fluence se.Rdf_r.checksum 25783144
+mini_fluence se.Rdf_a.size [30 1]
+mini_fluence se.Rdf_a.sum 0.37113260391759795
+mini_fluence se.Rdf_a.sumsq 0.0073272262086340181
+mini_fluence se.Rdf_a.first 0.050954159159983865
+mini_fluence se.Rdf_a.last 0.0012312012814712928
+mini_fluence se.Rdf_a.checksum 14444902
+mini_fluence se.Rdf 0.0085037460243816282
+mini_fluence se.Rdr 0
+mini_fluence se.Rt 0.0085037460243816282
+mini_fluence se.Tdf_ra.size [30 2001]
+mini_fluence se.Tdf_ra.sum 29871.720172879737
+mini_fluence se.Tdf_ra.sumsq 7493467.6735193096
+mini_fluence se.Tdf_ra.first 0
+mini_fluence se.Tdf_ra.last 0
+mini_fluence se.Tdf_ra.checksum 13137775
+mini_fluence se.Tdf_r.size [1 2001]
+mini_fluence se.Tdf_r.sum 983.27004443542603
+mini_fluence se.Tdf_r.sumsq 22886.418878409462
+mini_fluence se.Tdf_r.first 0
+mini_fluence se.Tdf_r.last 0
+mini_fluence se.Tdf_r.checksum 3982453
+mini_fluence se.Tdf_a.size [30 1]
+mini_fluence se.Tdf_a.sum 0.66648203397303163
+mini_fluence se.Tdf_a.sumsq 0.029873243708580317
+mini_fluence se.Tdf_a.first 0.10561395304563051
+mini_fluence se.Tdf_a.last 0
+mini_fluence se.Tdf_a.checksum 29213203
+mini_fluence se.Tdf 0.0090442333457234937
+mini_fluence se.Tdr 0
+mini_fluence se.Tt 0.0090442333457234937
+mini_fluence N 2000
+mini_fluence grid.ri.size [1 2001]
+mini_fluence grid.ri.sum 2002.0012970760313
+mini_fluence grid.ri.sumsq 2670.6688337842652
+mini_fluence grid.ri.first 0.00066666666666666664
+mini_fluence grid.ri.last 2.0005000416562528
+mini_fluence grid.ri.checksum 5652917
+mini_fluence grid.ai.size [30 1]
+mini_fluence grid.ai.sum 23.583383764406452
+mini_fluence grid.ai.sumsq 24.676753016645101
+mini_fluence grid.ai.first 0.034904989910627432
+mini_fluence grid.ai.last 1.5446223708042537
+mini_fluence grid.ai.checksum 5884672
+mini_fluence grid.zi.size [21 1]
+mini_fluence grid.zi.sum 1.1025
+mini_fluence grid.zi.sumsq 0.077131250000000012
+mini_fluence grid.zi.first 0.0025000000000000001
+mini_fluence grid.zi.last 0.10250000000000001
+mini_fluence grid.zi.checksum 9515475
+mini_fluence grid.dr.size [1 2001]
+mini_fluence grid.dr.sum 2.0010000000000017
+mini_fluence grid.dr.sumsq 0.0020010000000000227
+mini_fluence grid.dr.first 0.001
+mini_fluence grid.dr.last 0.001
+mini_fluence grid.dr.checksum 26992828
+mini_fluence grid.da.size [30 1]
+mini_fluence grid.da.sum 1.570796326794897
+mini_fluence grid.da.sumsq 0.082246703342411354
+mini_fluence grid.da.first 0.052359877559829883
+mini_fluence grid.da.last 0.052359877559829883
+mini_fluence grid.da.checksum 129725
+mini_fluence grid.dz.size [21 1]
+mini_fluence grid.dz.sum 0.10500000000000002
+mini_fluence grid.dz.sumsq 0.00052500000000000008
+mini_fluence grid.dz.first 0.0050000000000000001
+mini_fluence grid.dz.last 0.0050000000000000001
+mini_fluence grid.dz.checksum 18961404
+mini_fluence grid.dA.size [1 2001]
+mini_fluence grid.dA.sum 12.578940126566184
+mini_fluence grid.dA.sumsq 0.10543376633567246
+mini_fluence grid.dA.first 3.1415926535897929e-06
+mini_fluence grid.dA.last 0.012569512207011817
+mini_fluence grid.dA.checksum 16357816
+mini_fluence grid.dsr.size [30 1]
+mini_fluence grid.dsr.sum 6.2831853071795862
+mini_fluence grid.dsr.sumsq 1.6231139781357242
+mini_fluence grid.dsr.first 0.0086108870940619572
+mini_fluence grid.dsr.last 0.3288365113028589
+mini_fluence grid.dsr.checksum 6974949

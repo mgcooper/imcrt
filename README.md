@@ -6,7 +6,7 @@ ice Monte Carlo Radiative Transfer.
 
 ## Dependencies
 
-A working installation of Matlab or GNU Octave. Confirmed to run on Matlab R2020b and Octave 7.2.0, but it should run on any recent release, and there should not be any toolbox dependencies.
+A working installation of MATLAB. The test suite runs on R2025b with no toolboxes. Developed on R2020b and Octave 7.2.0. Older releases and GNU Octave are nominally supported but untested. The project has no dependencies other than the code included here.
 
 ## Install
 
@@ -14,11 +14,24 @@ Run `Setup.m`. If running in Octave, check `.octaverc`.
 
 ## Usage
 
-Run `mcrt_verify.m` to verify model accuracy. There are three simulations that compare model output with van De Hulst's tabulated solutions to the transfer equation. It could easily be modified for a different problem by setting the inherent optical properties and geometry to new values.
+Run `mcrt_verify` to verify model accuracy. The `reflect` case compares hemispherical and angular reflectance and transmittance with van de Hulst's tabulated solutions to the transfer equation (Vol. 2, Table 35). The `fluence` case runs the internal-fluence problem from Wang et al. (1995).
 
-The `examples` directory includes code needed to reproduce the detector interference simulations reported in the paper below. If you wanted to investigate the influence of an instrument on optical measurements, that code would be a good place to start (e.g. see `rodintersect.m`).
+The `examples` directory includes code needed to reproduce the detector interference simulations reported in [Cooper et al 2021](#how-do-i-cite-this), the work this code was developed for. If you wanted to investigate the influence of an instrument on optical measurements, that code would be a good place to start (e.g. see `rodintersect.m`).
 
-For general use, there is a library of "inherent optical properties" (scattering and absorption coefficients) for water ice Ih saved in `dat/mie_iops_dE.mat`. The prefix `mie_` refers to the Mie scattering formulas used to compute the scattering coefficients. The suffix `_dE` refers to the "delta Eddington" approximation used to compute the extinction coefficients: $c=\sqrt{3ab_e}$ with extinction coefficient $c$, absorption coefficient $a$, and effective (or 'reduced') scattering coefficient $b_e$. Note that this equation is identical to the diffusion approximation, where $c$ is sometimes called the "propagation coefficient". It's inverse $1/c$ is the "transport length". See `doc/tc-2020-53-supplement.pdf` for more details on how these values enter into the Monte Carlo model. In addition, `dat/ssa_iops_dE.mat` contains the same values of absorption coefficient, but values of scattering and extinction coefficient computed with the "specific surface area" approximation, which is also called the "geometric optics" approximation. This approximation is valid for scatterers about the same size or slightly larger than the interacting wavelengths. The effective particle radii are saved in the libary as well.
+For general use, there is a library of "inherent optical properties" (scattering and absorption coefficients) for water ice Ih saved in `dat/mie_iops_dE.mat`. The prefix `mie_` refers to the Mie scattering formulas used to compute the scattering coefficients. The suffix `_dE` refers to the "delta Eddington" approximation used to compute the extinction coefficients: $c=\sqrt{3ab_e}$ with extinction coefficient $c$, absorption coefficient $a$, and effective (or 'reduced') scattering coefficient $b_e$. Note that this equation is identical to the diffusion approximation, where $c$ is sometimes called the "propagation coefficient". It's inverse $1/c$ is the "transport length". See `doc/tc-2020-53-supplement.pdf` for more details on how these values enter into the Monte Carlo model.
+
+`dat/ssa_iops_dE.mat` contains the same values of absorption coefficient, but values of scattering and extinction coefficient computed with the "specific surface area" approximation, also called the "geometric optics" approximation. This approximation is valid for scatterers about the same size or slightly larger than the interacting wavelengths. The effective particle radii are saved in the libary.
+
+## Verification
+
+`mcrt_verify` runs one case at a time as a set of seeded simulations (8 for `reflect`, 4 for `fluence`) and prints a PASS/FAIL table. The `reflect` case compares hemispherical and angular reflectance and transmittance with van de Hulst's tabulated solutions (Vol. 2, Table 35). The `fluence` case runs the internal-fluence problem from Wang et al. (1995) with self-consistency checks, since no numeric reference is in the repository. Call `mcrt_verify('fluence')` to pick a case; the default is `reflect`, and the function returns the verdict table and the runs. Every run carries its own standard errors for the reflectance and transmittance outputs in `RT.se`; with fewer than four runs the verdict uses those instead of the spread over runs.
+
+For the full multi-run check, run the driver from the repo root (MATLAB only: it uses `datetime` and the JVM's SHA-256). Run the dry run at `scale = 1e-2` first. The driver checkpoints every run and writes a dated PASS/FAIL report and one figure per case under `verify_out/`:
+
+    Setup; addpath('tests/verify'); vdhverify('verify_out', 1e-2)
+    Setup; addpath('tests/verify'); vdhverify('verify_out')
+
+The cases are in `tests/verify/verifycases.m`. To add a case, add an entry there, add a verdict function for its reference, and add a branch to `mcrt_verify`. The fast test suite is `runtests('tests')`; `tests/README.md` describes it and the on-demand perf suite.
 
 ## How do I cite this?
 
