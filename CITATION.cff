@@ -5,7 +5,9 @@ cff-version: 1.2.0
 title: iMCRT
 message: >-
   If you use this software, please cite it using the
-  metadata from this file.
+  metadata from this file. Use the version DOI listed for
+  the release you ran; the concept DOI resolves to all
+  versions.
 type: software
 authors:
   - given-names: Matthew
@@ -15,7 +17,7 @@ authors:
 identifiers:
   - type: doi
     value: 10.5281/zenodo.4579072
-    description: The DOI for version 1.2.0 of the software
+    description: The concept DOI representing all versions of iMCRT
 repository-code: 'https://github.com/mgcooper/imcrt'
 url: 'https://github.com/mgcooper/imcrt'
 keywords:
@@ -23,5 +25,5 @@ keywords:
   - monte carlo
   - glacier ice
 license: MIT
-version: 1.2.0
-date-released: '2021-05-21'
+version: 2.0.0
+date-released: '2026-09-10'
