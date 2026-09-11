@@ -1,6 +1,6 @@
 # `imcrt`
 
-[![DOI](https://zenodo.org/badge/344242726.svg)](https://zenodo.org/badge/latestdoi/344242726)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4579072.svg)](https://doi.org/10.5281/zenodo.4579072)
 
 ice Monte Carlo Radiative Transfer.  
 
@@ -33,9 +33,47 @@ For the full multi-run check, run the driver from the repo root (MATLAB only: it
 
 The cases are in `tests/verify/verifycases.m`. To add a case, add an entry there, add a verdict function for its reference, and add a branch to `mcrt_verify`. The fast test suite is `runtests('tests')`; `tests/README.md` describes it and the on-demand perf suite.
 
+## Limitations
+
+The model is a plane-parallel, homogeneous slab with a vertical pencil source.
+Scattering follows the Henyey-Greenstein phase function. Lengths are in cm.
+
+- There is no refractive-index boundary, so the model has no Fresnel
+  reflection, no refraction, and no specular term. Direct reflectance is
+  therefore zero.
+- The tally options default to `wmin` 1e-4, `wrr` 10, `R` 2 cm, `dr` 0.001 cm,
+  and `da` pi/60, which gives 30 angular bins over the hemisphere. Set any of
+  them using name-value input options in `mcrt`.
+- The roulette threshold comparison (1e-4 against 1e-5) was measured only for
+  the van de Hulst case at albedo 0.9, where no packet reaches either
+  threshold. The fluence case at albedo 0.999 was not compared. Roulette is
+  unbiased, so the threshold changes only the variance and the run time.
+- The radial bin beyond `R` pools every packet at r > R and is normalized as
+  one more ring of width `dr`. Its per-area density is meaningless when much
+  light leaves past `R`.
+- The depth bin beyond `Z` stays empty. A packet that crosses `Z` is scored as
+  transmitted before any absorption is tallied.
+- `RT.se` gives per-run standard errors for the reflectance and transmittance
+  outputs only. Absorption and fluence errors come from the spread over
+  multiple seeded runs.
+- The `fluence` case is verified by reproducing Fig. 4 of Wang et al. 1995. The
+  repository holds no numeric fluence reference. Only the `reflect` case has a
+  tabulated reference.
+- `chgdir` takes its on-axis branch only below a polar angle of 1e-12 rad. A
+  direction between 1e-12 and 1e-6 rad loses about eps/theta^2 of its unit
+  norm. Such an angle occurs about once in 1e12 scatters for near-isotropic
+  directions and about once in 2e6 scatters at g = 0.999. The verification and
+  paper cases use g up to 0.9.
+
+`tests/reports/Post-publication corrections.md` states the corrections made to
+`src/mcrt.m` after publication and their sizes.
+`tests/reports/impact-report.md` quantifies them.
+
 ## How do I cite this?
 
-If you find this model useful, please consider citing the software release (see `CITATION.cff`), and/or the following paper:
+If you find this model useful, please consider citing the software release, and/or the following paper.
+
+Cite the version DOI of the release you ran, so the citation resolves to that exact code. Each release lists its version DOI in its GitHub release notes and on its Zenodo record. Note: Zenodo mints that DOI after the tag exists, so a downloaded release archive carries only the concept DOI `10.5281/zenodo.4579072`, which resolves to all versions. `CITATION.cff` on the repository branches carries both. `CHANGELOG.md` records what changed between releases.
 
 Cooper, M.G., Smith, L.C., Rennermalm, A.K., Tedesco, M., Muthyala, R., Leidman, S.Z., Moustafa, S.E., Fayne, J.V., 2021. Spectral attenuation coefficients from measurements of light transmission in bare ice on the Greenland Ice Sheet. The Cryosphere 15, 1931–1953. https://doi.org/10.5194/tc-15-1931-2021
 

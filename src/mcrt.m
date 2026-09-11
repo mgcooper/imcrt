@@ -32,6 +32,12 @@ function RT = mcrt(ka, ks, g, Z, dz, N, varargin)
    %  R/dr and (pi/2)/da must be whole numbers. Every option is a double
    %  scalar; a bad one or an unknown name raises mcrt:input.
    %
+   %  The model is a plane-parallel homogeneous slab with a vertical pencil
+   %  source and no refractive-index boundary, so it has no Fresnel term and
+   %  no refraction. See the Limitations section of README.md for the full
+   %  statement and tests/reports/Post-publication corrections.md for the
+   %  corrections made after publication.
+   %
    % Matt Cooper, guycooper@ucla.edu, Dec 2020
    %
    % See also: buildgrid, binindex, computeReflectance, computeTransmittance,
