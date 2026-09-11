@@ -18,6 +18,9 @@ identifiers:
   - type: doi
     value: 10.5281/zenodo.4579072
     description: The concept DOI representing all versions of iMCRT
+  - type: doi
+    value: 10.5281/zenodo.22702925
+    description: The version DOI for iMCRT v2.0.0
 repository-code: 'https://github.com/mgcooper/imcrt'
 url: 'https://github.com/mgcooper/imcrt'
 keywords:
